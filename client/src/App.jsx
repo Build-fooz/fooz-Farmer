@@ -1,3 +1,4 @@
+import Categories from "./components/Categories";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
 import PartnerRegistration from "./components/PartnerRegistration";
@@ -7,10 +8,11 @@ function App() {
   return (
     <>
       <Header />
-      <main className="bg-gray-50">
+      <main className="bg-gray-100">
         <Hero />
         <SourcesProducts />
         <PartnerRegistration />
+        <Categories />
       </main>
     </>
   );
