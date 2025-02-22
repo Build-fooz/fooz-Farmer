@@ -2,7 +2,7 @@ import React from "react";
 
 export default function Categories() {
   return (
-    <section className="flex flex-col items-center py-10">
+    <section className="flex flex-col items-center py-16">
       <h6 className="mb-2 text-3xl font-bold">Our Product Categories</h6>
       <p className="mb-4 text-gray-500">
         Discover the range of products you can sell through our platform
