@@ -1,9 +1,26 @@
 import React from "react";
+import { useState, useEffect } from "react";
 import StatBox from "../Components/StatBox";
 import TrendingItem from "../Components/TrendingItem";
 import ChatSupport from "../Components/ChatSupport";
 
 const Dashboard = () => {
+  const [analyticsData, setAnalyticsData] = useState(null);
+
+  useEffect(() => {
+    const fetchAnalyticsData = async () => {
+      try {
+        const response = await fetch("/api/analytics"); // Fetching analytics data from backend
+        const data = await response.json();
+        setAnalyticsData(data);
+      } catch (error) {
+        console.error("Error fetching analytics data:", error);
+      }
+    };
+    
+    fetchAnalyticsData();
+  }, []);
+
     return (
       <div className="min-h-screen w-full bg-gray-100 flex flex-col items-center p-6">
         <header className="w-full max-w-3xl text-center mb-6">
@@ -17,12 +34,28 @@ const Dashboard = () => {
             <StatBox title="Products Listed" value="12" bgColor="bg-blue-100" />
             <StatBox title="Total Sales" value="₹24,500" bgColor="bg-green-100" />
             <StatBox title="Active Orders" value="5" bgColor="bg-purple-100" />
+          {analyticsData ? (
+            <>
+              <StatBox title="Products Listed" value={analyticsData.productsListed} bgColor="bg-blue-100" />
+              <StatBox title="Total Sales" value={`₹${analyticsData.totalSales}`} bgColor="bg-green-100" />
+              <StatBox title="Active Orders" value={analyticsData.activeOrders} bgColor="bg-purple-100" />
+            </>
+          ) : (
+            <p className="text-black">Loading data...</p>
+          )}
           </div>
   
           <div className="mb-6">
             <h3 className="font-semibold text-md mb-2 text-black">Trending Products</h3>
             <TrendingItem name="Organic Tomatoes" status="High Demand" />
             <TrendingItem name="Fresh Spinach" status="Trending" />
+          {analyticsData && analyticsData.trendingProducts ? (
+            analyticsData.trendingProducts.map((product, index) => (
+              <TrendingItem key={index} name={product.name} status={product.status} />
+            ))
+          ) : (
+            <p className="text-black">Loading...</p>
+          )}
           </div>
   
           <ChatSupport />
