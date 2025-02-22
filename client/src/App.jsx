@@ -6,7 +6,11 @@ import DeliveryDashboard from './Pages/DeliveryDashboard'
 function App() {
 
   return (
+    <>
     <DeliveryDashboard/>
+    <Dashboard/>
+    </>
+    
   )
 }
 
