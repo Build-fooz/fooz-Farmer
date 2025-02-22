@@ -4,6 +4,7 @@ import Hero from "./components/Hero";
 import PartnerRegistration from "./components/PartnerRegistration";
 import SourcesProducts from "./components/SourcesProducts";
 import SuccessStories from "./components/SuccessStories";
+import WhyPartner from "./components/WhyPartner";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <PartnerRegistration />
         <Categories />
         <SuccessStories />
+        <WhyPartner />
       </main>
     </>
   );
