@@ -9,7 +9,6 @@ import {
   faMapMarkerAlt,
   faSeedling,
 } from "@fortawesome/free-solid-svg-icons";
-// import logo from "../assets/images/logo.png";
 import logo from "../assets/images/logo.png";
 
 const Register = () => {
@@ -81,7 +80,7 @@ const Register = () => {
         <img src={logo} alt="Farmer Connect Logo" className="w-24" />
       </div>
 
-      <div className="bg-white shadow-lg rounded-xl p-13 max-w-3xl w-full">
+      <div className="bg-white shadow-lg rounded-xl p-14 max-w-3xl w-full">
         <h2 className="text-2xl font-bold text-center text-gray-800">
           Register as a Partner Farmer
         </h2>
