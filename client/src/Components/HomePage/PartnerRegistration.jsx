@@ -3,7 +3,7 @@ import CloudUpload from "../../assets/images/HomePage/cloud-upload.png";
 
 export default function PartnerRegistration() {
   return (
-    <section className="bg-white py-10">
+    <section id="register" className="bg-white py-10">
       <div className="text-center text-2xl font-bold">
         Register as a Partner Farmer
       </div>

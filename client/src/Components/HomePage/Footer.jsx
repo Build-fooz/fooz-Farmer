@@ -11,7 +11,7 @@ import Twitter from "../../assets/images/HomePage/twitter.svg";
 
 export default function Footer() {
   return (
-    <footer className="bg-[#201c2c] text-white">
+    <footer id="footer" className="bg-[#201c2c] text-white">
       <div className="flex px-32 py-10">
         <div className="flex-1">
           <img src={Logo} alt="Fooz logo" className="h-20" />

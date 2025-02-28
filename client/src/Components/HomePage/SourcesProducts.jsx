@@ -6,7 +6,7 @@ import PlantFill from "../../assets/images/HomePage/plant-fill.svg";
 
 export default function SourcesProducts() {
   return (
-    <section className="py-10">
+    <section id="products" className="py-10">
       <div className="mb-6 text-center text-3xl font-bold">
         Products We Source
       </div>

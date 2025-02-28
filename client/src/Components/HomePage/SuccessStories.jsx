@@ -32,7 +32,7 @@ export default function SuccessStories() {
   ];
 
   return (
-    <section className="bg-white py-6">
+    <section id="testimonials" className="bg-white py-6">
       <p className="my-4 text-center text-3xl font-bold">
         Farmer Success stories
       </p>
