@@ -26,10 +26,83 @@ const Register = () => {
 
   const [filePreview, setFilePreview] = useState(null);
   const [dragActive, setDragActive] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  // Validation rules
+  const validateField = (name, value) => {
+    let error = "";
+    switch (name) {
+      case "fullName":
+        if (!value.trim()) error = "Full Name is required";
+        else if (!/^[A-Za-z\s]+$/.test(value)) error = "Name should only contain alphabets and spaces";
+        break;
+      case "phone":
+        if (!value.trim()) error = "Phone Number is required";
+        else if (!/^\d{10}$/.test(value)) error = "Invalid Phone Number (10 digits required)";
+        break;
+      case "email":
+        if (!value.trim()) error = "Email is required";
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+          error = "Invalid Email";
+        break;
+      case "location":
+        if (!value.trim()) error = "Location is required";
+        break;
+      case "farmSize":
+        if (!value.trim()) error = "Farm Size is required";
+        else if (!/^\d+$/.test(value)) error = "Farm Size must be a whole number";
+        else if (parseInt(value) <= 0) error = "Farm Size must be greater than 0";
+        break;
+      case "products":
+        if (value.length === 0) error = "Please select at least one product";
+        break;
+      case "file":
+        if (!value) error = "Farm Certificate is required";
+        break;
+      default:
+        break;
+    }
+    return error;
+  };
+
+  // Restrict input for name field (only alphabets and spaces)
+  const handleNameInput = (e) => {
+    const { value } = e.target;
+    if (/^[A-Za-z\s]*$/.test(value)) {
+      setFormData({ ...formData, fullName: value });
+    }
+  };
+
+  // Restrict input for phone field (only digits)
+  const handlePhoneInput = (e) => {
+    const { value } = e.target;
+    if (/^\d*$/.test(value)) {
+      setFormData({ ...formData, phone: value });
+    }
+  };
+
+  // Restrict input for farm size field (only digits)
+  const handleFarmSizeInput = (e) => {
+    const { value } = e.target;
+    if (/^\d*$/.test(value)) {
+      setFormData({ ...formData, farmSize: value });
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+    // Validate field on change
+    const error = validateField(name, value);
+    setErrors((prev) => ({ ...prev, [name]: error }));
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    // Validate field on blur
+    const error = validateField(name, value);
+    setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
   const handleCheckbox = (e) => {
@@ -40,6 +113,13 @@ const Register = () => {
         ? [...prev.products, value]
         : prev.products.filter((item) => item !== value),
     }));
+
+    // Validate products on change
+    const updatedProducts = checked
+      ? [...formData.products, value]
+      : formData.products.filter((item) => item !== value);
+    const error = validateField("products", updatedProducts);
+    setErrors((prev) => ({ ...prev, products: error }));
   };
 
   const handleFileChange = (e) => {
@@ -47,6 +127,9 @@ const Register = () => {
     if (file) {
       setFormData({ ...formData, file });
       setFilePreview(URL.createObjectURL(file));
+
+      // Clear file error if a file is uploaded
+      setErrors((prev) => ({ ...prev, file: "" }));
     }
   };
 
@@ -66,12 +149,28 @@ const Register = () => {
     if (file) {
       setFormData({ ...formData, file });
       setFilePreview(URL.createObjectURL(file));
+
+      // Clear file error if a file is uploaded
+      setErrors((prev) => ({ ...prev, file: "" }));
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
+
+    // Validate all fields before submission
+    const newErrors = {};
+    Object.keys(formData).forEach((key) => {
+      const error = validateField(key, formData[key]);
+      if (error) newErrors[key] = error;
+    });
+    setErrors(newErrors);
+
+    // Check if there are any errors
+    if (Object.keys(newErrors).length === 0) {
+      console.log("Form Data:", formData);
+      // Proceed with form submission
+    }
   };
 
   return (
@@ -100,10 +199,14 @@ const Register = () => {
                 name="fullName"
                 placeholder="Full Name"
                 value={formData.fullName}
-                onChange={handleChange}
+                onChange={handleNameInput}
+                onBlur={handleBlur}
                 className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
                 required
               />
+              {errors.fullName && (
+                <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
+              )}
             </div>
 
             <div className="relative">
@@ -116,10 +219,15 @@ const Register = () => {
                 name="phone"
                 placeholder="Phone Number"
                 value={formData.phone}
-                onChange={handleChange}
+                onChange={handlePhoneInput}
+                onBlur={handleBlur}
                 className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
                 required
+                maxLength="10"
               />
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+              )}
             </div>
           </div>
 
@@ -135,9 +243,13 @@ const Register = () => {
                 placeholder="Email Address"
                 value={formData.email}
                 onChange={handleChange}
+                onBlur={handleBlur}
                 className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
                 required
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
             </div>
 
             <div className="relative">
@@ -151,9 +263,13 @@ const Register = () => {
                 placeholder="Farm Location (City, State)"
                 value={formData.location}
                 onChange={handleChange}
+                onBlur={handleBlur}
                 className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
                 required
               />
+              {errors.location && (
+                <p className="text-red-500 text-sm mt-1">{errors.location}</p>
+              )}
             </div>
           </div>
 
@@ -167,10 +283,14 @@ const Register = () => {
               name="farmSize"
               placeholder="Farm Size (in Acres)"
               value={formData.farmSize}
-              onChange={handleChange}
+              onChange={handleFarmSizeInput}
+              onBlur={handleBlur}
               className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
               required
             />
+            {errors.farmSize && (
+              <p className="text-red-500 text-sm mt-1">{errors.farmSize}</p>
+            )}
           </div>
 
           <fieldset className="border border-gray-300 p-4 rounded-lg">
@@ -185,6 +305,9 @@ const Register = () => {
                 </label>
               ))}
             </div>
+            {errors.products && (
+              <p className="text-red-500 text-sm mt-1">{errors.products}</p>
+            )}
           </fieldset>
 
           <div
@@ -206,6 +329,9 @@ const Register = () => {
                 )}
               </div>
             </label>
+            {errors.file && (
+              <p className="text-red-500 text-sm mt-1">{errors.file}</p>
+            )}
           </div>
 
           <button type="submit" className="w-full bg-black text-white p-3 rounded-lg font-semibold hover:bg-gray-800 transition">

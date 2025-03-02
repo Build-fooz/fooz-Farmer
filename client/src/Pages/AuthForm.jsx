@@ -3,19 +3,32 @@ import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPhone, faLock } from "@fortawesome/free-solid-svg-icons";
 import logo from "../assets/images/logo.png";
-
-
 import { useNavigate } from "react-router-dom";
-
 
 const AuthForm = () => {
   const [otpSent, setOtpSent] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
   const navigate = useNavigate();
 
+  // Phone Number Validation (Only 10 Digits)
+  const handlePhoneChange = (e) => {
+    const value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
+    if (value.length <= 10) {
+      setPhone(value);
+    }
+  };
+
+  // OTP Validation (Only 6 Digits)
+  const handleOtpChange = (e) => {
+    const value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
+    if (value.length <= 6) {
+      setOtp(value);
+    }
+  };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4 relative">
-      
       {/* Logo at Top Left */}
       <div className="absolute top-4 left-4">
         <img src={logo} alt="Farmer Connect Logo" className="w-24" />
@@ -34,8 +47,15 @@ const AuthForm = () => {
           <input
             type="text"
             placeholder="Phone Number"
-            className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none"
+            value={phone}
+            onChange={handlePhoneChange}
+            className={`w-full pl-10 p-3 border ${
+              phone.length === 10 ? "border-gray-300" : "border-red-500"
+            } rounded-lg focus:ring-2 focus:ring-green-400 outline-none`}
           />
+          {phone.length > 0 && phone.length < 10 && (
+            <p className="text-red-500 text-sm mt-1">Enter a valid 10-digit phone number</p>
+          )}
         </div>
 
         {/* OTP Input (Shown After Clicking "Send OTP") */}
@@ -45,28 +65,39 @@ const AuthForm = () => {
             <input
               type="text"
               placeholder="Enter OTP"
-              className="w-full pl-10 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-400 outline-none"
+              value={otp}
+              onChange={handleOtpChange}
+              className={`w-full pl-10 p-3 border ${
+                otp.length === 6 ? "border-gray-300" : "border-red-500"
+              } rounded-lg focus:ring-2 focus:ring-green-400 outline-none`}
             />
+            {otp.length > 0 && otp.length < 6 && (
+              <p className="text-red-500 text-sm mt-1">Enter a valid 6-digit OTP</p>
+            )}
           </div>
         )}
 
         {/* Submit Button */}
         <button
-  onClick={() => setOtpSent(true)}
-  className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-all"
->
-  {otpSent ? "Verify OTP" : "Send OTP"}
-</button>
+          onClick={() => {
+            if (phone.length === 10) {
+              setOtpSent(true);
+            }
+          }}
+          className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-all"
+        >
+          {otpSent ? "Verify OTP" : "Send OTP"}
+        </button>
 
-{/* Register Button at Bottom */}
-<div className="mt-4 text-center">
-  <p className="text-gray-600">Don't have an account?</p>
-  <button
-    onClick={() => navigate("/Register")}
-    className="mt-2 text-black font-semibold hover:text-gray-700"
-  >
-    Register
-  </button>
+        {/* Register Button at Bottom */}
+        <div className="mt-4 text-center">
+          <p className="text-gray-600">Don't have an account?</p>
+          <button
+            onClick={() => navigate("/register")}
+            className="mt-2 text-black font-semibold hover:text-gray-700"
+          >
+            Register
+          </button>
         </div>
       </div>
     </div>
@@ -74,7 +105,6 @@ const AuthForm = () => {
 };
 
 export default AuthForm;
-
 
 
 
