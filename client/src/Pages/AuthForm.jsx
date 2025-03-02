@@ -9,6 +9,7 @@ const AuthForm = () => {
   const [otpSent, setOtpSent] = useState(false);
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
+  const [generatedOtp, setGeneratedOtp] = useState("");
   const navigate = useNavigate();
 
   // Phone Number Validation (Only 10 Digits)
@@ -24,6 +25,26 @@ const AuthForm = () => {
     const value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
     if (value.length <= 6) {
       setOtp(value);
+    }
+  };
+
+  // Generate and Send OTP
+  const generateAndSendOtp = () => {
+    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate 6-digit OTP
+    setGeneratedOtp(otp);
+    setOtpSent(true);
+
+    // Simulate sending OTP to the user's phone
+    console.log(`OTP sent to ${phone}: ${otp}`);
+  };
+
+  // Verify OTP
+  const verifyOtp = () => {
+    if (otp === generatedOtp) {
+      console.log("OTP verified successfully!");
+      navigate("/dashboard"); // Redirect to dashboard or another page
+    } else {
+      alert("Invalid OTP. Please try again.");
     }
   };
 
@@ -50,7 +71,7 @@ const AuthForm = () => {
             value={phone}
             onChange={handlePhoneChange}
             className={`w-full pl-10 p-3 border ${
-              phone.length === 10 ? "border-gray-300" : "border-red-500"
+              phone.length === 10 ? "border-gray-300" : "border-gray-500"
             } rounded-lg focus:ring-2 focus:ring-green-400 outline-none`}
           />
           {phone.length > 0 && phone.length < 10 && (
@@ -80,8 +101,10 @@ const AuthForm = () => {
         {/* Submit Button */}
         <button
           onClick={() => {
-            if (phone.length === 10) {
-              setOtpSent(true);
+            if (phone.length === 10 && !otpSent) {
+              generateAndSendOtp(); // Generate and send OTP
+            } else if (otpSent) {
+              verifyOtp(); // Verify OTP
             }
           }}
           className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-all"
@@ -105,8 +128,3 @@ const AuthForm = () => {
 };
 
 export default AuthForm;
-
-
-
-
-

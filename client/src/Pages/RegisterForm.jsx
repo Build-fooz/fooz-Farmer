@@ -27,6 +27,9 @@ const Register = () => {
   const [filePreview, setFilePreview] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const [errors, setErrors] = useState({});
+  const [otp, setOtp] = useState("");
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [generatedOtp, setGeneratedOtp] = useState("");
 
   // Validation rules
   const validateField = (name, value) => {
@@ -155,6 +158,15 @@ const Register = () => {
     }
   };
 
+  const generateAndSendOtp = () => {
+    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate 6-digit OTP
+    setGeneratedOtp(otp);
+    setIsOtpSent(true);
+
+    // Simulate sending OTP to the user's email or phone
+    console.log(`OTP sent to ${formData.email}: ${otp}`);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -168,8 +180,24 @@ const Register = () => {
 
     // Check if there are any errors
     if (Object.keys(newErrors).length === 0) {
+      generateAndSendOtp(); // Generate and send OTP
+    }
+  };
+
+  const handleOtpChange = (e) => {
+    setOtp(e.target.value);
+  };
+
+  const handleOtpSubmit = (e) => {
+    e.preventDefault();
+
+    if (otp === generatedOtp) {
+      console.log("OTP verified successfully!");
       console.log("Form Data:", formData);
-      // Proceed with form submission
+      // Proceed with form submission or redirect to another page
+      navigate("/dashboard"); // Example: Redirect to dashboard
+    } else {
+      alert("Invalid OTP. Please try again.");
     }
   };
 
@@ -180,171 +208,203 @@ const Register = () => {
       </div>
 
       <div className="bg-white shadow-lg rounded-xl p-14 max-w-3xl w-full">
-        <h2 className="text-2xl font-bold text-center text-gray-800">
-          Register as a Partner Farmer
-        </h2>
-        <p className="text-center text-gray-500 mb-6">
-          Join our growing community of sustainable farmers
-        </p>
+        {isOtpSent ? (
+          <>
+            <h2 className="text-2xl font-bold text-center text-gray-800">
+              OTP Verification
+            </h2>
+            <p className="text-center text-gray-500 mb-6">
+              Please enter the 6-digit OTP sent to your email/phone.
+            </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="relative">
-              <FontAwesomeIcon
-                icon={faUser}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              />
-              <input
-                type="text"
-                name="fullName"
-                placeholder="Full Name"
-                value={formData.fullName}
-                onChange={handleNameInput}
-                onBlur={handleBlur}
-                className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
-                required
-              />
-              {errors.fullName && (
-                <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
-              )}
-            </div>
+            <form onSubmit={handleOtpSubmit} className="space-y-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  name="otp"
+                  placeholder="Enter OTP"
+                  value={otp}
+                  onChange={handleOtpChange}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
+                  required
+                  maxLength="6"
+                />
+              </div>
 
-            <div className="relative">
-              <FontAwesomeIcon
-                icon={faPhone}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              />
-              <input
-                type="tel"
-                name="phone"
-                placeholder="Phone Number"
-                value={formData.phone}
-                onChange={handlePhoneInput}
-                onBlur={handleBlur}
-                className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
-                required
-                maxLength="10"
-              />
-              {errors.phone && (
-                <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
-              )}
-            </div>
-          </div>
+              <button type="submit" className="w-full bg-black text-white p-3 rounded-lg font-semibold hover:bg-gray-800 transition">
+                Verify OTP
+              </button>
+            </form>
+          </>
+        ) : (
+          <>
+            <h2 className="text-2xl font-bold text-center text-gray-800">
+              Register as a Partner Farmer
+            </h2>
+            <p className="text-center text-gray-500 mb-6">
+              Join our growing community of sustainable farmers
+            </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="relative">
-              <FontAwesomeIcon
-                icon={faEnvelope}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                value={formData.email}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
-                required
-              />
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-              )}
-            </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="relative">
+                  <FontAwesomeIcon
+                    icon={faUser}
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  />
+                  <input
+                    type="text"
+                    name="fullName"
+                    placeholder="Full Name"
+                    value={formData.fullName}
+                    onChange={handleNameInput}
+                    onBlur={handleBlur}
+                    className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
+                    required
+                  />
+                  {errors.fullName && (
+                    <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
+                  )}
+                </div>
 
-            <div className="relative">
-              <FontAwesomeIcon
-                icon={faMapMarkerAlt}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              />
-              <input
-                type="text"
-                name="location"
-                placeholder="Farm Location (City, State)"
-                value={formData.location}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
-                required
-              />
-              {errors.location && (
-                <p className="text-red-500 text-sm mt-1">{errors.location}</p>
-              )}
-            </div>
-          </div>
+                <div className="relative">
+                  <FontAwesomeIcon
+                    icon={faPhone}
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  />
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="Phone Number"
+                    value={formData.phone}
+                    onChange={handlePhoneInput}
+                    onBlur={handleBlur}
+                    className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
+                    required
+                    maxLength="10"
+                  />
+                  {errors.phone && (
+                    <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+                  )}
+                </div>
+              </div>
 
-          <div className="relative">
-            <FontAwesomeIcon
-              icon={faSeedling}
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            />
-            <input
-              type="text"
-              name="farmSize"
-              placeholder="Farm Size (in Acres)"
-              value={formData.farmSize}
-              onChange={handleFarmSizeInput}
-              onBlur={handleBlur}
-              className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
-              required
-            />
-            {errors.farmSize && (
-              <p className="text-red-500 text-sm mt-1">{errors.farmSize}</p>
-            )}
-          </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="relative">
+                  <FontAwesomeIcon
+                    icon={faEnvelope}
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  />
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Email Address"
+                    value={formData.email}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
+                    required
+                  />
+                  {errors.email && (
+                    <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                  )}
+                </div>
 
-          <fieldset className="border border-gray-300 p-4 rounded-lg">
-            <legend className="text-gray-700 font-semibold">
-              Products You Grow
-            </legend>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-              {["Organic Vegetables", "Red Chilli", "Honey", "Coffee", "Cloves", "Other Spices"].map((product, index) => (
-                <label key={index} className="flex items-center space-x-2">
-                  <input type="checkbox" value={product} onChange={handleCheckbox} className="rounded" />
-                  <span>{product}</span>
-                </label>
-              ))}
-            </div>
-            {errors.products && (
-              <p className="text-red-500 text-sm mt-1">{errors.products}</p>
-            )}
-          </fieldset>
+                <div className="relative">
+                  <FontAwesomeIcon
+                    icon={faMapMarkerAlt}
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  />
+                  <input
+                    type="text"
+                    name="location"
+                    placeholder="Farm Location (City, State)"
+                    value={formData.location}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
+                    required
+                  />
+                  {errors.location && (
+                    <p className="text-red-500 text-sm mt-1">{errors.location}</p>
+                  )}
+                </div>
+              </div>
 
-          <div
-            className={`border-2 border-dashed rounded-lg p-6 text-center transition ${dragActive ? "border-green-600 bg-green-100" : "border-gray-300"}`}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-          >
-            <input type="file" id="fileUpload" className="hidden" onChange={handleFileChange} />
-            <label htmlFor="fileUpload" className="cursor-pointer">
-              <div className="text-gray-500">
-                {filePreview ? (
-                  <img src={filePreview} alt="Preview" className="w-32 h-32 object-cover mx-auto rounded-lg shadow-md" />
-                ) : (
-                  <>
-                    <p className="text-lg font-semibold">Drag & Drop or Click to Upload</p>
-                    <p className="text-sm text-gray-400">Upload Farm Certificates (PNG, JPG, PDF)</p>
-                  </>
+              <div className="relative">
+                <FontAwesomeIcon
+                  icon={faSeedling}
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                />
+                <input
+                  type="text"
+                  name="farmSize"
+                  placeholder="Farm Size (in Acres)"
+                  value={formData.farmSize}
+                  onChange={handleFarmSizeInput}
+                  onBlur={handleBlur}
+                  className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
+                  required
+                />
+                {errors.farmSize && (
+                  <p className="text-red-500 text-sm mt-1">{errors.farmSize}</p>
                 )}
               </div>
-            </label>
-            {errors.file && (
-              <p className="text-red-500 text-sm mt-1">{errors.file}</p>
-            )}
-          </div>
 
-          <button type="submit" className="w-full bg-black text-white p-3 rounded-lg font-semibold hover:bg-gray-800 transition">
-            Submit Registration
-          </button>
-        </form>
+              <fieldset className="border border-gray-300 p-4 rounded-lg">
+                <legend className="text-gray-700 font-semibold">
+                  Products You Grow
+                </legend>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                  {["Organic Vegetables", "Red Chilli", "Honey", "Coffee", "Cloves", "Other Spices"].map((product, index) => (
+                    <label key={index} className="flex items-center space-x-2">
+                      <input type="checkbox" value={product} onChange={handleCheckbox} className="rounded" />
+                      <span>{product}</span>
+                    </label>
+                  ))}
+                </div>
+                {errors.products && (
+                  <p className="text-red-500 text-sm mt-1">{errors.products}</p>
+                )}
+              </fieldset>
 
-        <div className="mt-4 text-center">
-          <p className="text-gray-600">Already have an account?</p>
-          <button onClick={() => navigate("/")} className="mt-2 text-black font-semibold hover:text-gray-700">
-            Back to Login
-          </button>
-        </div>
+              <div
+                className={`border-2 border-dashed rounded-lg p-6 text-center transition ${dragActive ? "border-green-600 bg-green-100" : "border-gray-300"}`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
+                <input type="file" id="fileUpload" className="hidden" onChange={handleFileChange} />
+                <label htmlFor="fileUpload" className="cursor-pointer">
+                  <div className="text-gray-500">
+                    {filePreview ? (
+                      <img src={filePreview} alt="Preview" className="w-32 h-32 object-cover mx-auto rounded-lg shadow-md" />
+                    ) : (
+                      <>
+                        <p className="text-lg font-semibold">Drag & Drop or Click to Upload</p>
+                        <p className="text-sm text-gray-400">Upload Farm Certificates (PNG, JPG, PDF)</p>
+                      </>
+                    )}
+                  </div>
+                </label>
+                {errors.file && (
+                  <p className="text-red-500 text-sm mt-1">{errors.file}</p>
+                )}
+              </div>
+
+              <button type="submit" className="w-full bg-black text-white p-3 rounded-lg font-semibold hover:bg-gray-800 transition">
+                Submit Registration
+              </button>
+            </form>
+
+            <div className="mt-4 text-center">
+              <p className="text-gray-600">Already have an account?</p>
+              <button onClick={() => navigate("/")} className="mt-2 text-black font-semibold hover:text-gray-700">
+                Back to Login
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
