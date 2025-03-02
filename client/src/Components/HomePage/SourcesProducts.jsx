@@ -10,7 +10,7 @@ export default function SourcesProducts() {
       <div className="mb-6 text-center text-3xl font-bold">
         Products We Source
       </div>
-      <div className="grid grid-cols-4">
+      <div className="grid md:grid-cols-4">
         <div className="m-4 flex flex-col items-center rounded-xl border-2 border-gray-200 bg-white py-10">
           <img src={PlantFill} alt="Plant icon" className="h-10" />
           <p className="text-center text-xl font-bold">Organic Products</p>

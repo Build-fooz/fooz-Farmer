@@ -7,11 +7,11 @@ export default function Categories() {
   return (
     <section className="flex flex-col items-center py-16">
       <h6 className="mb-2 text-3xl font-bold">Our Product Categories</h6>
-      <p className="mb-4 text-gray-500">
+      <p className="mb-4 text-gray-500 text-center md:text-left">
         Discover the range of products you can sell through our platform
       </p>
-      <div className="flex px-20">
-        <div className="mx-2 flex-1 rounded-xl bg-white p-6">
+      <div className="flex md:px-20 px-2 flex-col md:flex-row">
+        <div className="m-2 flex-1 rounded-xl bg-white p-6">
           <div className="w-full rounded-lg">
             <img
               src={Vegetables}
@@ -31,7 +31,7 @@ export default function Categories() {
             </a>
           </div>
         </div>
-        <div className="mx-2 flex-1 rounded-xl bg-white p-6">
+        <div className="m-2 flex-1 rounded-xl bg-white p-6">
           <div className="w-full rounded-lg">
             <img
               src={Honey}
@@ -51,7 +51,7 @@ export default function Categories() {
             </a>
           </div>
         </div>
-        <div className="mx-2 flex-1 rounded-xl bg-white p-6">
+        <div className="m-2 flex-1 rounded-xl bg-white p-6">
           <div className="w-full rounded-lg">
             <img
               src={Spices}
