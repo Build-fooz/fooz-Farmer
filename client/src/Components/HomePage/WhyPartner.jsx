@@ -14,8 +14,8 @@ export default function WhyPartner() {
         We're committed to supporting sustainable farming and fair trade
         practices
       </p>
-      <div className="my-10 flex justify-center px-40">
-        <div className="mx-4 flex-1 rounded-lg bg-white p-4 shadow">
+      <div className="my-10 flex justify-center px-2 md:px-40 flex-col md:flex-row">
+        <div className="m-4 flex-1 rounded-lg bg-white p-4 shadow">
           <div className="w-max rounded-full bg-gray-200 p-2">
             <img src={HandHoldingUSD} alt="Savings icon" className="h-6" />
           </div>
@@ -25,7 +25,7 @@ export default function WhyPartner() {
             platform.
           </p>
         </div>
-        <div className="mx-4 flex-1 rounded-lg bg-white p-4 shadow">
+        <div className="m-4 flex-1 rounded-lg bg-white p-4 shadow">
           <div className="w-max rounded-full bg-gray-200 p-2">
             <img src={GroupOfPeople} alt="Savings icon" className="h-6" />
           </div>
@@ -35,7 +35,7 @@ export default function WhyPartner() {
             significantly.
           </p>
         </div>
-        <div className="mx-4 flex-1 rounded-lg bg-white p-4 shadow">
+        <div className="m-4 flex-1 rounded-lg bg-white p-4 shadow">
           <div className="w-max rounded-full bg-gray-200 p-2">
             <img src={DeliveryTruck} alt="Savings icon" className="h-6" />
           </div>

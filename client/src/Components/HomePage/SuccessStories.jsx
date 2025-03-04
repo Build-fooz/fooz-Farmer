@@ -32,18 +32,18 @@ export default function SuccessStories() {
   ];
 
   return (
-    <section className="bg-white py-6">
+    <section id="testimonials" className="bg-white py-6">
       <p className="my-4 text-center text-3xl font-bold">
         Farmer Success stories
       </p>
       <p className="text-center text-gray-600">
         Hear from our partner farmers about their experience.
       </p>
-      <div className="flex overflow-x-scroll p-8">
+      <div className="flex overflow-x-scroll p-8 flex-col md:flex-row">
         {stories.map((story, idx) => (
           <div
             key={idx}
-            className="h-5-6 mx-3 w-1/3 rounded-xl bg-gray-100 p-4"
+            className="h-5-6 mx-3 md:w-1/3 rounded-xl bg-gray-100 p-4 mb-2"
           >
             <div className="flex items-center">
               <img
@@ -74,7 +74,7 @@ export default function SuccessStories() {
                   key={index}
                 />
               ))}
-              <p className="mx-4 text-gray-600">
+              <p className="mx-4 text-gray-600 text-xs md:text-base">
                 Partner since {story.partnerSince}
               </p>
             </div>
