@@ -356,7 +356,7 @@ const Register = () => {
                   Products You Grow
                 </legend>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                  {["Organic Vegetables", "Red Chilli", "Honey", "Coffee", "Cloves", "Other Spices"].map((product, index) => (
+                  {["Organic Vegetables", "Red Chillis", "Honey", "Coffee", "Cloves", "Other Spices"].map((product, index) => (
                     <label key={index} className="flex items-center space-x-2">
                       <input type="checkbox" value={product} onChange={handleCheckbox} className="rounded" />
                       <span>{product}</span>
