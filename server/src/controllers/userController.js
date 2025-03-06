@@ -1,10 +1,13 @@
 const { Farmer } = require("../models/User");
+const crypto = require("crypto");
+const jwtLib = require("jsonwebtoken");
+const { verifyOTP } = require("../utils/sms");
 
 /**
  * @author Tarang Patil
  * @param {import("express").Request} req
  * @param {import("express").Response} res
- * @returns {Promise<Farmer>}
+ * @returns {Promise<void>}
  */
 async function createFarmer(req, res) {
   const { fullName, phone, email, location, products, farmSize } = req.body;
@@ -44,4 +47,34 @@ async function createFarmer(req, res) {
   }
 }
 
-module.exports = { createFarmer };
+/**
+ * @author Tarang Patil
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns {Promise<void>}
+ */
+async function loginFarmer(req, res) {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: "invalid email" });
+
+  const farmer = await Farmer.findOne({ email });
+  delete farmer.certificate.fileData;
+  farmer.certificate.fileData = undefined;
+
+  if (!(await verifyOTP(farmer._id)))
+    return res.status(400).json({ message: "invalid otp" });
+
+  const jwt = jwtLib.sign(
+    {
+      email: farmer.email,
+      phoneNumber: farmer.phoneNumber,
+      fullName: farmer.fullName,
+    },
+    process.env.AUTH_TOKEN_SECRET,
+    { expiresIn: "3 days" }
+  );
+
+  return res.json({ jwt });
+}
+
+module.exports = { createFarmer, loginFarmer };
