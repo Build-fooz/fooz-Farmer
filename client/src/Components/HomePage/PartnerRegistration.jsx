@@ -12,18 +12,15 @@ export default function PartnerRegistration() {
       </p>
       <form
         className="mx-auto w-[95vw] max-w-[50rem]"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const formData = new FormData(e.currentTarget);
-          console.log(formData);
-        }}
+        method="post"
+        action="http://localhost:3000/farmer/post"
       >
         <div className="my-6 flex justify-center flex-col md:flex-row">
           <label className="flex flex-1 flex-col items-start px-4 mb-2">
             Full name
             <input
               type="text"
-              name="name"
+              name="fullName"
               className="w-full border-2 border-gray-300 px-4 py-2"
               placeholder="John Doe"
             />
@@ -32,7 +29,7 @@ export default function PartnerRegistration() {
             Phone number
             <input
               type="text"
-              name="phone-number"
+              name="phone"
               className="w-full border-2 border-gray-300 px-4 py-2"
               placeholder="+1 (555) 000-0000"
             />
@@ -52,7 +49,7 @@ export default function PartnerRegistration() {
             Farm Location
             <input
               type="text"
-              name="farm-location"
+              name="location"
               className="w-full border-2 border-gray-300 px-4 py-2"
               placeholder="City, State"
             />
@@ -63,7 +60,7 @@ export default function PartnerRegistration() {
             Farm Size (acres)
             <input
               type="number"
-              name="farm-size"
+              name="farmSize"
               className="w-full border-2 border-gray-300 px-4 py-2"
               placeholder="johndoe@example.com"
             />
@@ -71,62 +68,30 @@ export default function PartnerRegistration() {
         </div>
         <p className="px-4">Products You Grow</p>
         <div className="my-2 flex justify-evenly flex-col md:flex-row">
-          <label className="flex flex-1 items-center px-4">
-            <input
-              type="checkbox"
-              name="products-grown"
-              value="organic-vegetables"
-              className="border-2 border-gray-300 px-4 py-2"
-            />
-            &nbsp; Organic vegetables
-          </label>
-          <label className="flex flex-1 items-center px-4">
-            <input
-              type="checkbox"
-              name="products-grown"
-              value="honey"
-              className="border-2 border-gray-300 px-4 py-2"
-            />
-            &nbsp; Honey
-          </label>
-          <label className="flex flex-1 items-center px-4">
-            <input
-              type="checkbox"
-              name="products-grown"
-              value="cloves"
-              className="border-2 border-gray-300 px-4 py-2"
-            />
-            &nbsp; Cloves
-          </label>
+          {["Organic Vegetables", "Honey", "Cloves"].map((product, index) => (
+            <label className="flex flex-1 items-center px-4" key={index}>
+              <input
+                type="checkbox"
+                name="products"
+                value={product}
+                className="border-2 border-gray-300 px-4 py-2"
+              />
+              &nbsp; {product}
+            </label>
+          ))}
         </div>
         <div className="mb-6 flex justify-evenly flex-col md:flex-row">
-          <label className="flex flex-1 items-center px-4">
-            <input
-              type="checkbox"
-              name="products-grown"
-              value="red-chillis"
-              className="border-2 border-gray-300 px-4 py-2"
-            />
-            &nbsp; Red chillis
-          </label>
-          <label className="flex flex-1 items-center px-4">
-            <input
-              type="checkbox"
-              name="products-grown"
-              value="coffee"
-              className="border-2 border-gray-300 px-4 py-2"
-            />
-            &nbsp; Coffee
-          </label>
-          <label className="flex flex-1 items-center px-4">
-            <input
-              type="checkbox"
-              name="products-grown"
-              value="other-spices"
-              className="border-2 border-gray-300 px-4 py-2"
-            />
-            &nbsp; Other Spices
-          </label>
+          {["Red Chillis", "Coffee", "Other Spices"].map((product, index) => (
+            <label className="flex flex-1 items-center px-4" key={index}>
+              <input
+                type="checkbox"
+                name="products"
+                value={product}
+                className="border-2 border-gray-300 px-4 py-2"
+              />
+              &nbsp; {product}
+            </label>
+          ))}
         </div>
         <div className="my-6 w-full px-4">
           <p className="mb-2">Upload Farm Certificates</p>
