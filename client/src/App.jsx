@@ -20,7 +20,7 @@ function App() {
         <Route path="/deliverydashboard" element= {<DeliveryDashboard/>} />
         <Route path="/productlisting" element= {<ProductListing/>} />
         <Route path="/Register" element={<RegisterForm />} />
-        <Route path="/auth" element={<AuthForm />} />
+        <Route path="/Login" element={<AuthForm />} />
         <Route path="*" element={<NotFound />} /> {/* Handles unknown routes */}
       </Routes>
     </Router>
