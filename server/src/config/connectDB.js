@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
-const MONGODB_URI =
-  "mongodb+srv://tushar:tushar@fooz-test.pu1s8.mongodb.net/?retryWrites=true&w=majority&appName=FOOZ-test";
+const MONGODB_URI =//past you mongodb url
+ 
 
 const connectDB = async () => {
   try {
