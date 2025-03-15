@@ -3,7 +3,7 @@ import CloudUpload from "../../assets/images/HomePage/cloud-upload.png";
 
 export default function PartnerRegistration() {
   return (
-    <section className="bg-white py-10">
+    <section id="register" className="bg-white py-10">
       <div className="text-center text-2xl font-bold">
         Register as a Partner Farmer
       </div>
@@ -18,8 +18,8 @@ export default function PartnerRegistration() {
           console.log(formData);
         }}
       >
-        <div className="my-6 flex justify-center">
-          <label className="flex flex-1 flex-col items-start px-4">
+        <div className="my-6 flex justify-center flex-col md:flex-row">
+          <label className="flex flex-1 flex-col items-start px-4 mb-2">
             Full name
             <input
               type="text"
@@ -38,8 +38,8 @@ export default function PartnerRegistration() {
             />
           </label>
         </div>
-        <div className="my-6 flex justify-center">
-          <label className="flex flex-1 flex-col items-start px-4">
+        <div className="my-6 flex justify-center flex-col md:flex-row">
+          <label className="flex flex-1 flex-col items-start px-4 mb-4">
             E-mail address
             <input
               type="email"
@@ -70,7 +70,7 @@ export default function PartnerRegistration() {
           </label>
         </div>
         <p className="px-4">Products You Grow</p>
-        <div className="my-2 flex justify-evenly">
+        <div className="my-2 flex justify-evenly flex-col md:flex-row">
           <label className="flex flex-1 items-center px-4">
             <input
               type="checkbox"
@@ -99,7 +99,7 @@ export default function PartnerRegistration() {
             &nbsp; Cloves
           </label>
         </div>
-        <div className="mb-6 flex justify-evenly">
+        <div className="mb-6 flex justify-evenly flex-col md:flex-row">
           <label className="flex flex-1 items-center px-4">
             <input
               type="checkbox"
