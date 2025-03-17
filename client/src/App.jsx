@@ -7,6 +7,7 @@ import NotFound from './Pages/NotFound'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AuthForm from "./Pages/AuthForm";
 import RegisterForm from "./Pages/RegisterForm";
+import OrderPage from './Pages/OrderPage'
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/productListing" element= {<ProductListing/>} />
         <Route path="/Register" element={<RegisterForm />} />
         <Route path="/auth" element={<AuthForm />} />
+        <Route path= "/order" element={<OrderPage/>}/>
         <Route path="*" element={<NotFound />} /> {/* Handles unknown routes */}
       </Routes>
     </Router>
