@@ -13,4 +13,4 @@ Currently, two official plugins are available:
 Run the following command to clone the repository to your local machine:
 
 ```sh
-git clone https://github.com/your-username/your-repository.git
+git clone https://github.com/Build-fooz/fooz-Farmer.git
