@@ -24,7 +24,7 @@ Follow these steps to set up the project locally.
 1. Open your terminal
 2. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/fooz-Farmer.git
+   git clone https://github.com/Build-fooz/fooz-Farmer.git
    cd fooz-Farmer
    ```
 
