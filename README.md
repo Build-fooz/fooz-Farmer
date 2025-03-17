@@ -149,8 +149,5 @@ If you encounter merge conflicts:
 
 ## License
 
-[Add your license information here]
 
 ## Contact
-
-[Add your contact information here] 
