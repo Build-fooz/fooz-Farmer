@@ -356,6 +356,7 @@ const Register = () => {
                   )}
                 </div>
 
+                
                 <fieldset className="border border-gray-300 p-4 rounded-lg">
                   <legend className="text-gray-700 font-semibold">
                     Products You Grow
@@ -430,7 +431,7 @@ const Register = () => {
                   Back to Login
                 </button>
               </div>
-            </>
+              </>
           )}
         </div>
       </div>
