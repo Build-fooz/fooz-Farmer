@@ -1,3 +1,5 @@
+
+import Header from "../Components/HomePage/Header";
 import { useState,useEffect } from "react";
 import Logo from "../assets/images/logo.png";
 import { BiHeadphone } from "react-icons/bi";
@@ -40,10 +42,11 @@ export default function ProductListing() {
   };
   
   const stats = [
-    { label: "Products Listed", value: "12", bg: "bg-blue-200" },
-    { label: "Total Sales", value: "₹24,500", bg: "bg-green-200" },
-    { label: "Active Orders", value: "5", bg: "bg-purple-200" },
-    { label: "Draft Listings", value: "3", bg: "bg-yellow-200" },
+    { label: "Products Listed", value: "12", bg: "bg-blue-100" },
+    { label: "Total Sales", value: "₹24,500", bg: "bg-green-100" },
+    { label: "Active Orders", value: "5", bg: "bg-purple-100" },
+    { label: "Draft Listings", value: "3", bg: "bg-yellow-100" },
+
   ];
 
   const handleChange = (e) => {
@@ -111,18 +114,18 @@ export default function ProductListing() {
   
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-white pb-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Logo */}
-        <img src={Logo} alt="logo" width={100} height={100} className="mx-auto mb-3" />
+    <div>
+      <Header />
 
-        {/* Header */}
-        <div className="text-center mb-4">
-          <h1 className="font-bold text-xl mb-2">Product Listing</h1>
-          <p className="text-gray-500">Monitor your farm products performance</p>
+      <div className="p-6 bg-gray-100 min-h-screen">
+        {/* Heading and Subheading */}
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-gray-800">Product Listing</h1>
+          <p className="text-black">Monitor your farm products performance</p>
         </div>
 
         {/* Form Card */}
+
         <div className="p-4 mb-4 shadow-md rounded-lg bg-white">
           <h2 className="text-lg font-semibold mb-3">Product Listing Overview</h2>
           <h5 className="text-md font-medium mb-3">Add New Product</h5>
@@ -159,17 +162,18 @@ export default function ProductListing() {
                   onChange={handleChange}
                   onInput={(e) => {
                     e.target.value = e.target.value.replace(/[^0-9]/g, "");
-                  }}
+      }}
                 />
               </div>
 
-              {/* Unit Selection */}
-              <div className="w-1/6">
-                <label className="block font-medium">Unit</label>
+
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">Unit</label>
                 <select
-                  className="w-full border border-black p-2 rounded"
+                  name="unit"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
                   value={formData.unit}
-                  onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+                  onChange={handleChange}
                 >
                   {["kg", "g", "lb"].map((unit) => (
                     <option key={unit} value={unit}>
@@ -180,84 +184,106 @@ export default function ProductListing() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mb-3">
+
+            {/* Size/Grade and Selling Price */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block">Size/Grade</label>
+                <label className="block text-gray-700 font-medium mb-2">Size/Grade</label>
                 <select
-                  className="w-full border border-black p-2 rounded"
+                  name="size"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
                   value={formData.size}
-                  onChange={(e) => setFormData({ ...formData, size: e.target.value })}
+                  onChange={handleChange}
+
                 >
                   <option value="large">Large</option>
                   <option value="medium">Medium</option>
                   <option value="small">Small</option>
                 </select>
               </div>
+
               <div>
-                <label className="block">Selling Price</label>
-                <div className="relative w-full">
-                  {/* <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-700">RS</span> */}
+
+                <label className="block text-gray-700 font-medium mb-2">Selling Price</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">₹</span>
                   <input
                     type="number"
-                    className="w-full border border-black p-2 pl-6 rounded"
+                    name="sellingPrice"
                     placeholder="0"
                     min="0"
+                    className="w-full p-3 pl-8 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
                     value={formData.sellingPrice}
-                    onChange={(e) => setFormData({ ...formData, sellingPrice: e.target.value })}
+                    onChange={handleChange}
                     onInput={(e) => {
-                      e.target.value = e.target.value.replace(/[^0-9]/g, "");
+                      e.target.value = e.target.value.replace(/[^0-9]/g, ""); // Remove non-numeric characters
+
                     }}
                   />
                 </div>
               </div>
             </div>
 
-            <div className="mb-3">
-              <label className="block">Special Notes</label>
+
+            {/* Special Notes */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">Special Notes</label>
               <textarea
                 rows={3}
                 placeholder="E.g., Organic certification, harvest date"
-                className="w-full border border-black p-2 rounded"
-                name="specialNotes"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
                 value={formData.specialNotes}
-                onChange={handleChange}
-              ></textarea>
+                onChange={(e) => setFormData({ ...formData, specialNotes: e.target.value })}
+              />
             </div>
-            {/* Sell To & Current Market Price */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-              {/* Sell To */}
+
+            {/* Sell To and Current Market Price */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block font-medium">Sell To</label>
+                <label className="block text-gray-700 font-medium mb-2">Sell To</label>
                 <select
-                  className="w-full border border-black p-2 rounded"
                   name="sellTo"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
                   value={formData.sellTo}
                   onChange={handleChange}
                 >
                   <option value="fooz">Fooz Company</option>
                 </select>
               </div>
-              {/* Current Market Price */}
-              <div className="bg-blue-100 font-bold text-black p-3 rounded">
-                <label className="block">Current Market Price</label>
-                <span className="block">₹45-55/kg</span>
+
+              <div className="bg-blue-100 p-4 rounded-lg">
+                <label className="block text-gray-700 font-medium mb-2">Current Market Price</label>
+                <span className="text-gray-800 font-semibold">₹45-55/kg</span>
               </div>
             </div>
-            <div className="flex gap-3 py-3 w-full">
-              <button type="button" onClick={handleSaveDraft} className="w-full bg-gray-200 rounded text-black font-semibold p-2">
+
+            {/* Buttons */}
+            <div className="flex gap-4">
+              <button
+                type="button"
+                className="w-full bg-gray-200 text-gray-800 p-3 rounded-lg font-semibold hover:bg-gray-300 transition"
+              >
                 Save Draft
               </button>
-              <button type="submit" className="w-full bg-black text-white rounded p-2">
+              <button
+                type="submit"
+                className="w-full bg-black text-white p-3 rounded-lg font-semibold hover:bg-gray-800 transition"
+              >
+
                 List Product
               </button>
             </div>
           </form>
         
 
-          <hr className="border-1 border-gray-400 my-4" />
-          <h5 className="font-semibold mb-2">Photo Guidelines</h5>
-          <div className="bg-yellow-100 p-3 rounded mb-4">
-            <ul className="font-semibold list-disc pl-5">
+
+          <hr className="border-gray-300 my-6" />
+
+          {/* Photo Guidelines */}
+          <div className="bg-yellow-100 p-4 rounded-lg">
+            <h5 className="font-semibold text-gray-800 mb-3">Photo Guidelines</h5>
+            <ul className="list-disc pl-5 text-gray-700">
+
               {[
                 "Use natural lighting for best results",
                 "Include size reference object",
@@ -265,66 +291,75 @@ export default function ProductListing() {
                 "Ensure photos are clear and in focus",
                 "Highlight any unique features or quality indicators",
               ].map((tip, index) => (
-                <li key={index}>{tip}</li>
+                <li key={index} className="mb-2">
+                  {tip}
+                </li>
               ))}
             </ul>
           </div>
-          <hr className="border-1 border-gray-400 my-4 col-span-full" />
+
+          <hr className="border-gray-300 my-6" />
 
           {/* Stats */}
-          <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             {stats.map((stat, index) => (
               <div key={index} className={`p-4 rounded-lg shadow ${stat.bg}`}>
-                <small className="text-gray-600 text-center block">{stat.label}</small>
-                <h4 className="text-xl font-bold text-center mt-1">{stat.value}</h4>
+                <small className="text-gray-600 block">{stat.label}</small>
+                <h4 className="text-xl font-bold text-gray-800 mt-1">{stat.value}</h4>
               </div>
             ))}
-            <hr className="border-1 border-gray-400 my-4 col-span-full" />
           </div>
 
+          <hr className="border-gray-300 my-6" />
+
           {/* Trending Products */}
-          <div className="mb-4">
-            <h5 className="font-semibold mb-2">Trending Products</h5>
-            <ul className="list-none">
-              <li className="flex justify-between py-2">
-                <span>Organic Tomatoes</span>
+          <div className="mb-6">
+            <h5 className="font-semibold text-gray-800 mb-3">Trending Products</h5>
+            <ul className="space-y-2">
+              <li className="flex justify-between items-center">
+                <span className="text-gray-700">Organic Tomatoes</span>
                 <span className="text-green-600 text-sm font-medium">High Demand</span>
               </li>
-              <li className="flex justify-between py-2">
-                <span>Fresh Spinach</span>
+              <li className="flex justify-between items-center">
+                <span className="text-gray-700">Fresh Spinach</span>
+
                 <span className="text-green-600 text-sm font-medium">Trending</span>
               </li>
             </ul>
           </div>
-          <hr className="border-1 border-gray-400 my-3" />
+
+          <hr className="border-gray-300 my-6" />
 
           {/* Chat Support */}
-          <div className="p-4 mb-4 border border-gray-300 shadow-md rounded-lg bg-white">
-            <h4 className="font-semibold mb-3">Chat Support</h4>
-            <div className="bg-gray-200 rounded p-3">
-              <div className="flex items-center gap-2 mb-3">
-                <BiHeadphone size={20} />
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h4 className="font-semibold text-gray-800 mb-3">Chat Support</h4>
+            <div className="bg-gray-100 p-4 rounded-lg">
+              <div className="flex items-center gap-3 mb-3">
+                <BiHeadphone size={20} className="text-gray-700" />
                 <div>
-                  <h6 className="font-medium mb-0">Need Help?</h6>
-                  <p className="text-gray-500 text-sm mb-0">Our team is here to assist you</p>
+                  <h6 className="font-medium text-gray-800">Need Help?</h6>
+                  <p className="text-gray-500 text-sm">Our team is here to assist you</p>
                 </div>
               </div>
-              <button className="w-full bg-black text-white rounded p-2">Start Chat</button>
+              <button className="w-full bg-black text-white p-3 rounded-lg font-semibold hover:bg-gray-800 transition">
+                Start Chat
+              </button>
             </div>
           </div>
-          <hr className="border-1 border-gray-400 my-3" />
+
+          <hr className="border-gray-300 my-6" />
 
           {/* Analytics Insights */}
-          <div className="mb-4">
-            <h5 className="font-bold mb-2">Analytics Insights</h5>
-            <h6 className="font-semibold rounded bg-gray-200 p-3 pb-5">Sales Trend</h6>
-          </div>
           <div>
-            <h2>Drafts</h2>
-           {userId && <DraftCard userId={userId} onEdit={handleEdit} />}
+            <h5 className="font-bold text-gray-800 mb-3">Analytics Insights</h5>
+            <div className="bg-gray-100 p-4 rounded-lg">
+              <h6 className="font-semibold text-gray-700">Sales Trend</h6>
+            </div>
           </div>
         </div>
       </div>
+
+          <hr className="border-1 border-gray-400 my-3" />
 
     </div>
   );

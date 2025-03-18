@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import DeliveryCard from "../Components/Delivery/DeliveryCard";
 import RecentDeliveries from "../Components/Delivery/RecentDeliveries";
+import Header from "../Components/HomePage/Header";
 
 // Sample delivery data for testing before integrating with backend
 const sampleDeliveryData = {
@@ -39,6 +40,11 @@ const DeliveryDashboard = ({ deliveryId }) => {
   }, [deliveryId]); // Re-fetch if deliveryId changes
 
   return (
+      
+<div>
+<Header />
+
+
     <div className="min-h-screen w-full bg-gray-100 flex flex-col items-center p-6">
       {/* Header Section */}
       <header className="w-full max-w-3xl text-center mb-6">
@@ -49,6 +55,7 @@ const DeliveryDashboard = ({ deliveryId }) => {
       <DeliveryCard deliveryData={deliveryData} />
       {/* Render recent deliveries section */}
       <RecentDeliveries deliveries={deliveryData.recentDeliveries} />
+    </div>
     </div>
   );
 };
