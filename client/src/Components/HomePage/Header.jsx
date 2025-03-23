@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Logo from "../../assets/images/HomePage/logo.png";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { RxCross1 } from "react-icons/rx";
-
+import AuthForm from "../../Pages/AuthForm";
 export default function Header() {
   const [showSidebar, setShowSidebar] = useState(false);
   return (
@@ -54,10 +54,10 @@ export default function Header() {
           Contact
         </a>
         <a
-          href="#register"
+          href="auth"
           className="ml-6 rounded bg-black px-6 py-2 text-white"
         >
-          Join now
+          Join now 
         </a>
       </nav>
       {
