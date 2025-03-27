@@ -1,6 +1,8 @@
-const mongoose = require("../config/connectDB");
+const mongoose = require("mongoose");
 
-const FarmerSchema = new mongoose.Schema(
+const { Schema } = mongoose; // Extract Schema from mongoose
+
+const FarmerSchema = new Schema(
   {
     fullName: {
       type: String,
@@ -28,11 +30,10 @@ const FarmerSchema = new mongoose.Schema(
       required: true,
     },
     certificate: {
-      type: new mongoose.Schema({
+      type: new Schema({
         fileName: String,
-        fileData: Buffer,
-        /**Store the MIME type of the file */
-        contentType: String,
+        fileData: Buffer, // Store the file data
+        contentType: String, // Store the MIME type
       }),
       required: true,
     },
