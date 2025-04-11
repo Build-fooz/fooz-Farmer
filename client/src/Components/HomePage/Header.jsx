@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import Logo from "../../assets/images/HomePage/logo.png";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { RxCross1 } from "react-icons/rx";
-import { useAuth } from "../../context/AuthContext";
 
+import { useAuth } from "../../context/AuthContext";
 export default function Header() {
   const [showSidebar, setShowSidebar] = useState(false);
   const { user, logout, isAuthenticated } = useAuth();
@@ -80,6 +80,7 @@ export default function Header() {
         <a className="mx-4" href="#footer">
           Contact
         </a>
+
         
         {isAuthenticated ? (
           <>
@@ -119,6 +120,7 @@ export default function Header() {
             </Link>
           </>
         )}
+
       </nav>
       
       <button
