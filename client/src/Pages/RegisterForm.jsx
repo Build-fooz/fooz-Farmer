@@ -6,12 +6,14 @@ import {
   faPhone,
   faEnvelope,
   faMapMarkerAlt,
-  faSeedling,
+  faSeedling
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "../Components/HomePage/Header";
+import { useAuth } from "../context/AuthContext";
 
 const Register = () => {
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -26,9 +28,8 @@ const Register = () => {
   const [filePreview, setFilePreview] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const [errors, setErrors] = useState({});
-  const [otp, setOtp] = useState("");
-  const [isOtpSent, setIsOtpSent] = useState(false);
-  const [generatedOtp, setGeneratedOtp] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState("");
 
   // Validation rules
   const validateField = (name, value) => {
@@ -47,6 +48,7 @@ const Register = () => {
         else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
           error = "Invalid Email";
         break;
+      // Password field removed
       case "location":
         if (!value.trim()) error = "Location is required";
         break;
@@ -157,17 +159,9 @@ const Register = () => {
     }
   };
 
-  const generateAndSendOtp = () => {
-    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate 6-digit OTP
-    setGeneratedOtp(otp);
-    setIsOtpSent(true);
-
-    // Simulate sending OTP to the user's email or phone
-    console.log(`OTP sent to ${formData.email}: ${otp}`);
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setServerError("");
 
     // Validate all fields before submission
     const newErrors = {};
@@ -179,24 +173,41 @@ const Register = () => {
 
     // Check if there are any errors
     if (Object.keys(newErrors).length === 0) {
-      generateAndSendOtp(); // Generate and send OTP
-    }
-  };
+      setIsSubmitting(true);
 
-  const handleOtpChange = (e) => {
-    setOtp(e.target.value);
-  };
+      try {
+        // Create FormData object for file upload
+        const formDataToSend = new FormData();
+        formDataToSend.append("fullName", formData.fullName);
+        formDataToSend.append("phone", formData.phone);
+        formDataToSend.append("email", formData.email);
+        // Password field removed
+        formDataToSend.append("location", formData.location);
+        formDataToSend.append("farmSize", formData.farmSize);
+        formDataToSend.append("products", JSON.stringify(formData.products));
+        formDataToSend.append("certificate", formData.file);
 
-  const handleOtpSubmit = (e) => {
-    e.preventDefault();
+        // Send the registration request
+        const response = await fetch('http://localhost:3000/farmer/register', {
+          method: 'POST',
+          body: formDataToSend,
+        });
 
-    if (otp === generatedOtp) {
-      console.log("OTP verified successfully!");
-      console.log("Form Data:", formData);
-      // Proceed with form submission or redirect to another page
-      navigate("/dashboard"); // Example: Redirect to dashboard
-    } else {
-      alert("Invalid OTP. Please try again.");
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Registration failed');
+        }
+
+        // Registration successful, redirect to login page
+        alert("Registration successful! Please login to continue.");
+        navigate("/auth");
+      } catch (error) {
+        console.error("Registration error:", error);
+        setServerError(error.message || "Registration failed. Please try again.");
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -217,205 +228,266 @@ const Register = () => {
 
         {/* Card Container */}
         <div className="bg-white rounded-lg shadow-lg p-8 max-w-3xl mx-auto">
-          {isOtpSent ? (
-            <>
-              <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">
-                OTP Verification
-              </h2>
-              <p className="text-center text-gray-500 mb-6">
-                Please enter the 6-digit OTP sent to your email/phone.
+          {serverError && (
+            <div className="mb-6 p-4 bg-red-100 text-red-700 rounded-lg">
+              {serverError}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Full Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Full Name <span className="text-red-600">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <FontAwesomeIcon icon={faUser} />
+                </span>
+                <input
+                  type="text"
+                  name="fullName"
+                  placeholder="Enter your full name"
+                  value={formData.fullName}
+                  onChange={handleNameInput}
+                  onBlur={handleBlur}
+                  className={`w-full pl-10 p-3 border ${
+                    errors.fullName ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:ring focus:ring-green-300`}
+                  required
+                />
+              </div>
+              {errors.fullName && (
+                <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
+              )}
+            </div>
+
+            {/* Phone Number */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Phone Number <span className="text-red-600">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <FontAwesomeIcon icon={faPhone} />
+                </span>
+                <input
+                  type="text"
+                  name="phone"
+                  placeholder="Enter your 10-digit phone number"
+                  value={formData.phone}
+                  onChange={handlePhoneInput}
+                  onBlur={handleBlur}
+                  className={`w-full pl-10 p-3 border ${
+                    errors.phone ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:ring focus:ring-green-300`}
+                  required
+                  maxLength="10"
+                />
+              </div>
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+              )}
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email <span className="text-red-600">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <FontAwesomeIcon icon={faEnvelope} />
+                </span>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email address"
+                  value={formData.email}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={`w-full pl-10 p-3 border ${
+                    errors.email ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:ring focus:ring-green-300`}
+                  required
+                />
+              </div>
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
+            </div>
+
+            {/* Password field removed */}
+
+            {/* Farm Location */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Farm Location <span className="text-red-600">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <FontAwesomeIcon icon={faMapMarkerAlt} />
+                </span>
+                <input
+                  type="text"
+                  name="location"
+                  placeholder="Enter your farm location"
+                  value={formData.location}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={`w-full pl-10 p-3 border ${
+                    errors.location ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:ring focus:ring-green-300`}
+                  required
+                />
+              </div>
+              {errors.location && (
+                <p className="text-red-500 text-sm mt-1">{errors.location}</p>
+              )}
+            </div>
+
+            {/* Farm Size */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Farm Size (in acres) <span className="text-red-600">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                  <FontAwesomeIcon icon={faSeedling} />
+                </span>
+                <input
+                  type="text"
+                  name="farmSize"
+                  placeholder="Enter your farm size in acres"
+                  value={formData.farmSize}
+                  onChange={handleFarmSizeInput}
+                  onBlur={handleBlur}
+                  className={`w-full pl-10 p-3 border ${
+                    errors.farmSize ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:ring focus:ring-green-300`}
+                  required
+                />
+              </div>
+              {errors.farmSize && (
+                <p className="text-red-500 text-sm mt-1">{errors.farmSize}</p>
+              )}
+            </div>
+
+            {/* Products */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Products <span className="text-red-600">*</span>
+              </label>
+              <p className="text-xs text-gray-500 mb-2">
+                Select all products you currently harvest
+              </p>
+              <div
+                className={`grid grid-cols-2 md:grid-cols-3 gap-2 ${
+                  errors.products ? "border-red-500" : ""
+                }`}
+              >
+                {["Rice", "Wheat", "Pulses", "Fruits", "Vegetables", "Other"].map(
+                  (product) => (
+                    <div key={product} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id={product}
+                        name="products"
+                        value={product}
+                        checked={formData.products.includes(product)}
+                        onChange={handleCheckbox}
+                        className="h-4 w-4 text-green-600 rounded"
+                      />
+                      <label
+                        htmlFor={product}
+                        className="ml-2 text-sm text-gray-700"
+                      >
+                        {product}
+                      </label>
+                    </div>
+                  )
+                )}
+              </div>
+              {errors.products && (
+                <p className="text-red-500 text-sm mt-1">{errors.products}</p>
+              )}
+            </div>
+
+            {/* File Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Farm Certificate <span className="text-red-600">*</span>
+              </label>
+              <p className="text-xs text-gray-500 mb-2">
+                Upload a scanned copy or photo of your farm certificate/document
               </p>
 
-              <form onSubmit={handleOtpSubmit} className="space-y-4">
-                <div className="relative">
-                  <input
-                    type="text"
-                    name="otp"
-                    placeholder="Enter OTP"
-                    value={otp}
-                    onChange={handleOtpChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
-                    required
-                    maxLength="6"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-black text-white p-3 rounded-lg font-semibold hover:bg-gray-800 transition"
-                >
-                  Verify OTP
-                </button>
-              </form>
-            </>
-          ) : (
-            <>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="relative">
-                    <FontAwesomeIcon
-                      icon={faUser}
-                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                    />
-                    <input
-                      type="text"
-                      name="fullName"
-                      placeholder="Full Name"
-                      value={formData.fullName}
-                      onChange={handleNameInput}
-                      onBlur={handleBlur}
-                      className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
-                      required
-                    />
-                    {errors.fullName && (
-                      <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
-                    )}
-                  </div>
-
-                  <div className="relative">
-                    <FontAwesomeIcon
-                      icon={faPhone}
-                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                    />
-                    <input
-                      type="tel"
-                      name="phone"
-                      placeholder="Phone Number"
-                      value={formData.phone}
-                      onChange={handlePhoneInput}
-                      onBlur={handleBlur}
-                      className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
-                      required
-                      maxLength="10"
-                    />
-                    {errors.phone && (
-                      <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="relative">
-                    <FontAwesomeIcon
-                      icon={faEnvelope}
-                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                    />
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Email Address"
-                      value={formData.email}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
-                      required
-                    />
-                    {errors.email && (
-                      <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-                    )}
-                  </div>
-
-                  <div className="relative">
-                    <FontAwesomeIcon
-                      icon={faMapMarkerAlt}
-                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                    />
-                    <input
-                      type="text"
-                      name="location"
-                      placeholder="Farm Location (City, State)"
-                      value={formData.location}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
-                      required
-                    />
-                    {errors.location && (
-                      <p className="text-red-500 text-sm mt-1">{errors.location}</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="relative">
-                  <FontAwesomeIcon
-                    icon={faSeedling}
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  />
-                  <input
-                    type="text"
-                    name="farmSize"
-                    placeholder="Farm Size (in Acres)"
-                    value={formData.farmSize}
-                    onChange={handleFarmSizeInput}
-                    onBlur={handleBlur}
-                    className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
-                    required
-                  />
-                  {errors.farmSize && (
-                    <p className="text-red-500 text-sm mt-1">{errors.farmSize}</p>
-                  )}
-                </div>
-
-                <fieldset className="border border-gray-300 p-4 rounded-lg">
-                  <legend className="text-gray-700 font-semibold">
-                    Products You Grow
-                  </legend>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                    {["Organic Vegetables", "Red Chilli", "Honey", "Coffee", "Cloves", "Other Spices"].map((product, index) => (
-                      <label key={index} className="flex items-center space-x-2">
-                        <input type="checkbox" value={product} onChange={handleCheckbox} className="rounded" />
-                        <span>{product}</span>
-                      </label>
-                    ))}
-                  </div>
-                  {errors.products && (
-                    <p className="text-red-500 text-sm mt-1">{errors.products}</p>
-                  )}
-                </fieldset>
-
-                <div
-                  className={`border-2 border-dashed rounded-lg p-6 text-center transition ${dragActive ? "border-green-600 bg-green-100" : "border-gray-300"}`}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                >
-                  <input type="file" id="fileUpload" className="hidden" onChange={handleFileChange} />
-                  <label htmlFor="fileUpload" className="cursor-pointer">
-                    <div className="text-gray-500">
-                      {filePreview ? (
-                        <img src={filePreview} alt="Preview" className="w-32 h-32 object-cover mx-auto rounded-lg shadow-md" />
-                      ) : (
-                        <>
-                          <p className="text-lg font-semibold">Drag & Drop or Click to Upload</p>
-                          <p className="text-sm text-gray-400">Upload Farm Certificates (PNG, JPG, PDF)</p>
-                        </>
-                      )}
+              <div
+                className={`border-2 border-dashed rounded-lg p-4 ${
+                  dragActive ? "border-green-500" : "border-gray-300"
+                } ${errors.file ? "border-red-500" : ""}`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
+                <div className="text-center">
+                  {filePreview ? (
+                    <div className="mb-4">
+                      <img
+                        src={filePreview}
+                        alt="Preview"
+                        className="mx-auto h-32 object-cover rounded"
+                      />
+                      <p className="text-sm text-gray-500 mt-2">
+                        {formData.file?.name}
+                      </p>
                     </div>
-                  </label>
-                  {errors.file && (
-                    <p className="text-red-500 text-sm mt-1">{errors.file}</p>
+                  ) : (
+                    <div className="py-4">
+                      <p className="text-gray-500">
+                        Drag and drop your file here, or
+                      </p>
+                    </div>
                   )}
+
+                  <label className="inline-block bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded cursor-pointer">
+                    Browse File
+                    <input
+                      type="file"
+                      name="file"
+                      onChange={handleFileChange}
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      className="hidden"
+                    />
+                  </label>
                 </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-black text-white p-3 rounded-lg font-semibold hover:bg-gray-800 transition"
-                >
-                  Submit Registration
-                </button>
-              </form>
-
-              <div className="mt-4 text-center">
-                <p className="text-gray-600">Already have an account?</p>
-                <button
-                  onClick={() => navigate("/")}
-                  className="mt-2 text-black font-semibold hover:text-gray-700"
-                >
-                  Back to Login
-                </button>
               </div>
-            </>
-          )}
+              {errors.file && (
+                <p className="text-red-500 text-sm mt-1">{errors.file}</p>
+              )}
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="w-full bg-black text-white p-3 rounded-lg font-semibold hover:bg-gray-800 transition"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Registering..." : "Register"}
+            </button>
+
+            {/* Login Link */}
+            <div className="text-center mt-4">
+              <p className="text-gray-600">Already have an account?</p>
+              <button
+                type="button"
+                onClick={() => navigate("/auth")}
+                className="text-blue-600 font-semibold hover:underline"
+              >
+                Login
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
