@@ -52,16 +52,16 @@ export default function Footer() {
         <div className="flex-1">
           <div className="mb-3 text-xl font-bold text-white">Follow Us</div>
           <p className="my-2 flex justify-center md:justify-start">
-            <a href="" className="mx-1">
+            <a href="https://www.facebook.com/profile.php?id=61567381451953" className="mx-1">
               <img src={Facebook} alt="Facebook" className="h-4" />
             </a>
-            <a href="" className="mx-1">
+            <a href="https://x.com/foozfoods" className="mx-1">
               <img src={Twitter} alt="Twitter" className="h-4" />
             </a>
-            <a href="" className="mx-1">
+            <a href="https://www.instagram.com/fooz_food_/" className="mx-1">
               <img src={Instagram} alt="Instagram" className="h-4" />
             </a>
-            <a href="" className="mx-1">
+            <a href="https://www.linkedin.com/company/fooz-food-spices/posts/?feedView=all&viewAsMember=true" className="mx-1">
               <img src={LinkedIn} alt="LinkedIn" className="h-4" />
             </a>
           </p>

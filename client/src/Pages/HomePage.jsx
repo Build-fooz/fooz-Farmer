@@ -7,7 +7,7 @@ import Categories from "../Components/HomePage/Categories";
 import SuccessStories from "../Components/HomePage/SuccessStories";
 import WhyPartner from "../Components/HomePage/WhyPartner";
 import Footer from "../Components/HomePage/Footer";
-import Register from "./RegisterForm";
+
 
 export default function HomePage() {
   return (
