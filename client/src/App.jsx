@@ -36,7 +36,7 @@ function App() {
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/auth" element={<AuthForm />} />
           <Route path="/order" element={<OrderPage/>} />
-          <Route path= "/product" element={<ProductPage/>}/>
+          <Route path= "/products" element={<ProductPage/>}/>
           <Route path="*" element={<NotFound />} /> {/* Handles unknown routes */}
         </Routes>
       </Router>

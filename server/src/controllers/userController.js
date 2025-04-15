@@ -1,6 +1,7 @@
 const { Farmer } = require("../models/User");
 const jwt = require("jsonwebtoken");
 const { generateOTP, verifyOTP } = require("../utils/sms");
+const Analytics = require("../models/Analytics");
 
 async function createFarmer(req, res) {
   const { fullName, phone, email, location, products, farmSize } = req.body;
@@ -41,6 +42,29 @@ async function createFarmer(req, res) {
 
     // Save the farmer details to the database
     const newFarmerDocument = await newFarmer.save();
+
+    // Create initial analytics record for the new farmer
+    try {
+      const initialAnalytics = new Analytics({
+        userId: newFarmerDocument._id,
+        productsListed: 0,
+        totalSales: 0,
+        activeOrders: 0,
+        cancelledOrders: 0,
+        draftListings: 0,
+        trendingProducts: [],
+        salesTrend: {
+          labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+          data: [0, 0, 0, 0]
+        }
+      });
+      
+      await initialAnalytics.save();
+      console.log(`Analytics record created for farmer ${newFarmerDocument._id}`);
+    } catch (analyticsError) {
+      // Log the error but don't fail the registration
+      console.error('Error creating analytics record:', analyticsError);
+    }
 
     // Return the farmer document
     return res.json(newFarmerDocument);
