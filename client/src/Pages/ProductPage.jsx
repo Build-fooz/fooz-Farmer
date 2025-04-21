@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../Components/HomePage/Header';
 import { FiEdit, FiTrash2, FiPlus, FiSearch } from 'react-icons/fi';
+import { useAuth } from '../context/AuthContext';
+import { getAuthTokens } from '../utils/storage';
+import { productAPI } from '../services/api';
+import { toast } from 'react-toastify';
+import ProductForm from '../Components/ProductForm';
 
 const ProductPage = () => {
+  const { user } = useAuth();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -10,89 +16,117 @@ const ProductPage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
 
-  // Form Data for Add/Edit Product
-  const [formData, setFormData] = useState({
-    name: '',
-    category: 'Spices',
-    price: '',
-    stock: '',
-    description: '',
-  });
-
-  // Mock Data (Replace with API Call)
+  // Fetch Products from API
   useEffect(() => {
     const fetchProducts = async () => {
-      setTimeout(() => {
-        const mockProducts = [
-          {
-            id: 1,
-            name: 'Kashmiri Saffron',
-            category: 'Spices',
-            price: 1200,
-            stock: 20,
-            description: 'Pure Kashmiri Saffron, 1gm',
-          },
-          {
-            id: 2,
-            name: 'Malabar Black Pepper',
-            category: 'Spices',
-            price: 350,
-            stock: 50,
-            description: 'Organic Black Pepper, 100gm',
-          },
-          {
-            id: 3,
-            name: 'Darjeeling Green Tea',
-            category: 'Tea',
-            price: 450,
-            stock: 30,
-            description: 'Premium Green Tea Leaves, 50gm',
-          },
-        ];
-        setProducts(mockProducts);
+      try {
+        setLoading(true);
+        
+        // Get user ID and auth tokens
+        if (!user) {
+          toast.error("Please login to view your products");
+          return;
+        }
+        
+        const userId = user._id || user.id;
+        const { accessToken } = getAuthTokens();
+        
+        if (!accessToken) {
+          toast.error("Authentication required");
+          return;
+        }
+        
+        // Make API request using the productAPI service
+        const response = await productAPI.getUserProducts(userId);
+        
+        // The response format might be different, handle it accordingly
+        if (response.data) {
+          // Check different possible response formats
+          if (response.data.success && response.data.products) {
+            setProducts(response.data.products);
+          } else if (Array.isArray(response.data)) {
+            setProducts(response.data);
+          } else {
+            console.log("Unexpected response format:", response.data);
+            setProducts([]);
+            toast.warning("Received unexpected data format from server");
+          }
+        } else {
+          toast.error("Failed to fetch products");
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        toast.error(error.response?.data?.message || "Error loading products");
+      } finally {
         setLoading(false);
-      }, 1000);
+      }
     };
+    
     fetchProducts();
-  }, []);
+  }, [user]);
 
   // Filter Products by Search
   const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    product.productName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Handle Input Change for Form
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  // Add New Product
-  const handleAddProduct = () => {
-    const newProduct = {
-      id: products.length + 1,
-      ...formData,
-      price: Number(formData.price),
-      stock: Number(formData.stock),
-    };
-    setProducts([...products, newProduct]);
-    setIsAddModalOpen(false);
-    setFormData({ name: '', category: 'Spices', price: '', stock: '', description: '' });
-  };
-
-  // Edit Product
-  const handleEditProduct = () => {
-    const updatedProducts = products.map((product) =>
-      product.id === currentProduct.id ? { ...product, ...formData } : product
-    );
-    setProducts(updatedProducts);
-    setIsEditModalOpen(false);
+  // Handle successful product creation/update
+  const handleProductSuccess = (data) => {
+    if (data.product) {
+      if (isEditModalOpen) {
+        // Update the product in the list
+        setProducts(products.map(p => 
+          p.uuid === currentProduct.uuid ? data.product : p
+        ));
+        setIsEditModalOpen(false);
+      } else if (isAddModalOpen) {
+        // Add the new product to the list
+        setProducts([...products, data.product]);
+        setIsAddModalOpen(false);
+      }
+    } else if (data.draft && isAddModalOpen) {
+      // Draft was saved
+      setIsAddModalOpen(false);
+      toast.info("Draft saved successfully. You can access it from the Drafts page.");
+    }
   };
 
   // Delete Product
-  const handleDeleteProduct = (id) => {
-    const updatedProducts = products.filter((product) => product.id !== id);
-    setProducts(updatedProducts);
+  const handleDeleteProduct = async (uuid) => {
+    if (!window.confirm("Are you sure you want to remove this product?")) {
+      return;
+    }
+    
+    try {
+      // Send API request to update status to 'removed' using the productAPI service
+      const response = await productAPI.updateProductStatus(uuid, 'removed');
+      
+      // Handle various possible response formats
+      if (response.data) {
+        if (response.data.success || response.data.status === 'removed') {
+          toast.success("Product removed successfully!");
+          
+          // Remove the product from the products list
+          const updatedProducts = products.filter((product) => product.uuid !== uuid);
+          setProducts(updatedProducts);
+        } else {
+          console.log("Unexpected successful response:", response.data);
+          toast.success("Product status updated");
+          
+          // Refresh product list to be safe
+          const userId = user._id || user.id;
+          const refreshResponse = await productAPI.getUserProducts(userId);
+          if (refreshResponse.data.success && refreshResponse.data.products) {
+            setProducts(refreshResponse.data.products);
+          } else if (Array.isArray(refreshResponse.data)) {
+            setProducts(refreshResponse.data);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error removing product:", error);
+      toast.error(error.response?.data?.message || "Failed to remove product");
+    }
   };
 
   if (loading) {
@@ -135,49 +169,61 @@ const ProductPage = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price (₹)</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredProducts.map((product) => (
-                <tr key={product.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.category}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{product.price}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.stock}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => {
-                          setCurrentProduct(product);
-                          setFormData({
-                            name: product.name,
-                            category: product.category,
-                            price: product.price,
-                            stock: product.stock,
-                            description: product.description,
-                          });
-                          setIsEditModalOpen(true);
-                        }}
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                        <FiEdit />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteProduct(product.id)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <FiTrash2 />
-                      </button>
-                    </div>
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map((product) => (
+                  <tr key={product.uuid} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.uuid.substring(0, 8)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.productName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.quantity}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.unit}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.size}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{product.sellingPrice}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium 
+                        ${product.status === 'active' ? 'bg-green-100 text-green-800' : 
+                         product.status === 'sold' ? 'bg-blue-100 text-blue-800' : 
+                         'bg-gray-100 text-gray-800'}`}>
+                        {product.status.charAt(0).toUpperCase() + product.status.slice(1)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => {
+                            setCurrentProduct(product);
+                            setIsEditModalOpen(true);
+                          }}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          <FiEdit />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProduct(product.uuid)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <FiTrash2 />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8" className="px-6 py-4 text-center text-gray-500">
+                    No products found. Add your first product!
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
@@ -186,145 +232,56 @@ const ProductPage = () => {
       {/* Add Product Modal */}
       {isAddModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Add New Product</h2>
-            <div className="space-y-4">
-              <input
-                type="text"
-                name="name"
-                placeholder="Product Name"
-                className="w-full p-2 border border-gray-300 rounded"
-                value={formData.name}
-                onChange={handleInputChange}
-              />
-              <select
-                name="category"
-                className="w-full p-2 border border-gray-300 rounded"
-                value={formData.category}
-                onChange={handleInputChange}
-              >
-                <option value="Spices">Spices</option>
-                <option value="Coffee">Coffee</option>
-                <option value="Tea">Tea</option>
-                <option value="Honey">Honey</option>
-                <option value="Herbal Gel">Herbal Gel</option>
-                <option value="Essential Oils">Essential Oils</option>
-                <option value="Papads">Papads</option>
-                <option value="Pickles">Pickles</option>
-                <option value="Sharbats">Sharbats</option>
-                <option value="Seeds">Seeds</option>
-              </select>
-              <input
-                type="number"
-                name="price"
-                placeholder="Price (₹)"
-                className="w-full p-2 border border-gray-300 rounded"
-                value={formData.price}
-                onChange={handleInputChange}
-              />
-              <input
-                type="number"
-                name="stock"
-                placeholder="Stock Quantity"
-                className="w-full p-2 border border-gray-300 rounded"
-                value={formData.stock}
-                onChange={handleInputChange}
-              />
-              <textarea
-                name="description"
-                placeholder="Description"
-                className="w-full p-2 border border-gray-300 rounded"
-                value={formData.description}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="flex justify-end space-x-2 mt-4">
-              <button
+          <div className="bg-white p-6 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Add New Product</h2>
+              <button 
                 onClick={() => setIsAddModalOpen(false)}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                className="text-gray-500 hover:text-gray-700"
               >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddProduct}
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-              >
-                Add Product
+                ✕
               </button>
             </div>
+            
+            <ProductForm 
+              mode="add" 
+              onSuccess={handleProductSuccess} 
+              onCancel={() => setIsAddModalOpen(false)} 
+            />
           </div>
         </div>
       )}
 
       {/* Edit Product Modal */}
-      {isEditModalOpen && (
+      {isEditModalOpen && currentProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Edit Product</h2>
-            <div className="space-y-4">
-              <input
-                type="text"
-                name="name"
-                placeholder="Product Name"
-                className="w-full p-2 border border-gray-300 rounded"
-                value={formData.name}
-                onChange={handleInputChange}
-              />
-              <select
-                name="category"
-                className="w-full p-2 border border-gray-300 rounded"
-                value={formData.category}
-                onChange={handleInputChange}
-              >
-                <option value="Spices">Spices</option>
-                <option value="Coffee">Coffee</option>
-                <option value="Tea">Tea</option>
-                <option value="Honey">Honey</option>
-                <option value="Herbal Gel">Herbal Gel</option>
-                <option value="Essential Oils">Essential Oils</option>
-                <option value="Papads">Papads</option>
-                <option value="Pickles">Pickles</option>
-                <option value="Sharbats">Sharbats</option>
-                <option value="Seeds">Seeds</option>
-              </select>
-              <input
-                type="number"
-                name="price"
-                placeholder="Price (₹)"
-                className="w-full p-2 border border-gray-300 rounded"
-                value={formData.price}
-                onChange={handleInputChange}
-              />
-              <input
-                type="number"
-                name="stock"
-                placeholder="Stock Quantity"
-                className="w-full p-2 border border-gray-300 rounded"
-                value={formData.stock}
-                onChange={handleInputChange}
-              />
-              <textarea
-                name="description"
-                placeholder="Description"
-                className="w-full p-2 border border-gray-300 rounded"
-                value={formData.description}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="flex justify-end space-x-2 mt-4">
-              <button
+          <div className="bg-white p-6 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Edit Product</h2>
+              <button 
                 onClick={() => setIsEditModalOpen(false)}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                className="text-gray-500 hover:text-gray-700"
               >
-                Cancel
-              </button>
-              <button
-                onClick={handleEditProduct}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Save Changes
+                ✕
               </button>
             </div>
+            
+            <ProductForm 
+              mode="edit" 
+              initialData={{
+                productName: currentProduct.productName,
+                quantity: currentProduct.quantity,
+                unit: currentProduct.unit,
+                size: currentProduct.size,
+                sellingPrice: currentProduct.sellingPrice,
+                specialNotes: currentProduct.specialNotes || '',
+                sellTo: currentProduct.sellTo,
+                image: currentProduct.image
+              }}
+              productId={currentProduct.uuid}
+              onSuccess={handleProductSuccess}
+              onCancel={() => setIsEditModalOpen(false)}
+            />
           </div>
         </div>
       )}

@@ -18,3 +18,4 @@ router.put('/analytics/:userId', analyticsController.updateAnalytics);
 
 module.exports = router;
 
+

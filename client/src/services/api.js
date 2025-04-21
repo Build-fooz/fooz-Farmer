@@ -66,18 +66,25 @@ export const authAPI = {
 };
 
 export const productAPI = {
-  getAllProducts: () => api.get('/api/products'),
-  getProduct: (id) => api.get(`/api/products/${id}`),
-  createProduct: (productData) => api.post('/api/products', productData),
-  updateProduct: (id, productData) => api.put(`/api/products/${id}`, productData),
-  deleteProduct: (id) => api.delete(`/api/products/${id}`),
+  getAllProducts: () => api.get('/products'),
+  getUserProducts: (userId) => api.get(`/products?userId=${userId}`),
+  getProduct: (id) => api.get(`/products/${id}`),
+  createProduct: (productData) => api.post('/products', productData),
+  updateProduct: (id, productData) => api.put(`/products/${id}`, productData),
+  updateProductStatus: (id, status) => api.patch(`/products/${id}`, { status }),
+  deleteProduct: (id) => api.delete(`/products/${id}`),
+  // Draft APIs
+  saveDraft: (draftData) => api.post('/products/draft', draftData),
+  getDrafts: (userId) => api.get(`/products/draft/${userId}`),
+  deleteDraft: (id) => api.delete(`/products/draft/${id}`),
+  publishDraft: (id) => api.post(`/products/draft/${id}/publish`),
 };
 
 export const orderAPI = {
-  createOrder: (orderData) => api.post('/api/orders', orderData),
-  getOrders: () => api.get('/api/orders'),
-  getOrder: (id) => api.get(`/api/orders/${id}`),
-  updateOrderStatus: (id, status) => api.put(`/api/orders/${id}/status`, { status }),
+  createOrder: (orderData) => api.post('/orders', orderData),
+  getOrders: () => api.get('/orders'),
+  getOrder: (id) => api.get(`/orders/${id}`),
+  updateOrderStatus: (id, status) => api.put(`/orders/${id}/status`, { status }),
 };
 
 export default api; 

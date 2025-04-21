@@ -7,11 +7,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': {
-        target: 'http://localhost:3000', // Update this to match your server port
-        changeOrigin: true,
-        secure: false,
-      }
+      '/products': 'http://localhost:3000',
+      '/auth': 'http://localhost:3000',
+      '/orders': 'http://localhost:3000',
+      '/analytics': 'http://localhost:3000'
     }
   }
 })
