@@ -66,18 +66,18 @@ export const authAPI = {
 };
 
 export const productAPI = {
-  getAllProducts: () => api.get('/products'),
-  getUserProducts: (userId) => api.get(`/products?userId=${userId}`),
-  getProduct: (id) => api.get(`/products/${id}`),
-  createProduct: (productData) => api.post('/products', productData),
-  updateProduct: (id, productData) => api.put(`/products/${id}`, productData),
-  updateProductStatus: (id, status) => api.patch(`/products/${id}`, { status }),
-  deleteProduct: (id) => api.delete(`/products/${id}`),
+  getAllProducts: () => api.get('/api/products'),
+  getUserProducts: (userId) => api.get(`/api/products?userId=${userId}`),
+  getProduct: (id) => api.get(`/api/products/${id}`),
+  createProduct: (productData) => api.post('/api/products', productData),
+  updateProduct: (id, productData) => api.put(`/api/products/${id}`, productData),
+  updateProductStatus: (id, status) => api.patch(`/api/products/${id}`, { status }),
+  deleteProduct: (id) => api.delete(`/api/products/${id}`),
   // Draft APIs
-  saveDraft: (draftData) => api.post('/products/draft', draftData),
-  getDrafts: (userId) => api.get(`/products/draft/${userId}`),
-  deleteDraft: (id) => api.delete(`/products/draft/${id}`),
-  publishDraft: (id) => api.post(`/products/draft/${id}/publish`),
+  saveDraft: (draftData) => api.post('/api/products/draft', draftData),
+  getDrafts: (userId) => api.get(`/api/products/draft/${userId}`),
+  deleteDraft: (id) => api.delete(`/api/products/draft/${id}`),
+  publishDraft: (id) => api.post(`/api/products/draft/${id}/publish`),
 };
 
 export const orderAPI = {

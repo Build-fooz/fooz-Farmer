@@ -3,9 +3,10 @@ const router = express.Router();
 const productController = require("../controllers/productController");
 const { authenticateToken } = require("../middleware/auth");
 
-const { createProduct, saveDraft, getDrafts, publishDraft, deleteDraft } = productController;
+const { createProduct, saveDraft, getDrafts, publishDraft, deleteDraft, getUserProducts } = productController;
 
 // Protected routes
+router.get('/products', authenticateToken, getUserProducts);
 router.post("/products", authenticateToken, createProduct);
 router.post("/products/draft", authenticateToken, saveDraft);
 router.get('/products/draft/:userId', authenticateToken, getDrafts);

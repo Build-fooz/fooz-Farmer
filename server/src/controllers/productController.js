@@ -431,7 +431,7 @@ exports.getUserProducts = [
   verifyToken,
   async (req, res) => {
     try {
-      const { userId } = req.params;
+      const userId = req.query.userId;
       
       // Validate userId
       if (!userId) {
