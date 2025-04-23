@@ -143,9 +143,9 @@ const ProductPage = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredProducts.map((product) => (
+              {filteredProducts.map((product, index) => (
                 <tr key={product.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{index + 1}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.category}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{product.price}</td>
