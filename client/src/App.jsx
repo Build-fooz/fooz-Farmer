@@ -10,6 +10,7 @@ import RegisterForm from "./Pages/RegisterForm";
 import OrderPage from './Pages/OrderPage';
 import ProductPage from './Pages/ProductPage';
 import { AuthProvider } from './context/AuthContext'
+import { AnalyticsProvider } from './context/AnalyticsContext'
 import TestPage from './Pages/TestPage'
 
 // Wrap in try-catch to prevent blank page if there's an error
@@ -22,6 +23,16 @@ function SafeAuthProvider({ children }) {
   }
 }
 
+// Safe wrapper for AnalyticsProvider
+function SafeAnalyticsProvider({ children }) {
+  try {
+    return <AnalyticsProvider>{children}</AnalyticsProvider>;
+  } catch (error) {
+    console.error("Error in AnalyticsProvider:", error);
+    return children;
+  }
+}
+
 function App() {
   return (
     <SafeAuthProvider>
@@ -30,13 +41,24 @@ function App() {
           <Route path="/test" element={<TestPage />} />
           <Route path="/" element={<Home />} />
           {/* <Route path="/about" element={<About />} /> */}
-          <Route path="/userdashboard" element={<Dashboard/>} />
-          <Route path="/deliverydashboard" element={<DeliveryDashboard/>} />
+          
+          {/* Wrap routes that need analytics data with AnalyticsProvider */}
+          <Route path="/userdashboard" element={
+            <SafeAnalyticsProvider>
+              <Dashboard/>
+            </SafeAnalyticsProvider>
+          } />
+          <Route path="/deliverydashboard" element={
+            <SafeAnalyticsProvider>
+              <DeliveryDashboard/>
+            </SafeAnalyticsProvider>
+          } />
+          
           <Route path="/productListing" element={<ProductListing/>} />
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/auth" element={<AuthForm />} />
           <Route path="/order" element={<OrderPage/>} />
-          <Route path= "/product" element={<ProductPage/>}/>
+          <Route path= "/products" element={<ProductPage/>}/>
           <Route path="*" element={<NotFound />} /> {/* Handles unknown routes */}
         </Routes>
       </Router>

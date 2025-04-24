@@ -13,8 +13,8 @@ userRouter.post("/auth/refresh", authenticateToken, (req, res) => {
   res.json({ accessToken: req.newAccessToken });
 });
 
-// Farmer routes
-userRouter.post("/farmer/register", upload.single("certificate"), createFarmer);
-userRouter.post("/farmer/login", loginFarmer);
+// // Farmer routes
+// userRouter.post("/farmer/register", upload.single("certificate"), createFarmer);
+// userRouter.post("/farmer/login", loginFarmer);
 
 module.exports = userRouter;

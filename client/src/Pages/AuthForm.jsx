@@ -42,7 +42,7 @@ const AuthForm = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/auth/send-otp', {
+      const response = await fetch('http://localhost:3000/api/auth/send-otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

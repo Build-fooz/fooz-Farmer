@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const userRouter = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
+const analyticsRoutes = require("./routes/analyticsRoutes");
 const app = express();
 
 // Middleware
@@ -14,9 +15,9 @@ app.use(cors({
 }));
 
 // Routes
-app.use(userRouter);
-
+app.use("/api", userRouter);
 app.use("/api", productRoutes);
+app.use("/api", analyticsRoutes);
 
 //Test route
 app.get("/", (req, res) => {

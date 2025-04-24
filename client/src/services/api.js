@@ -37,7 +37,7 @@ api.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        const response = await axios.post(`${API_URL}/auth/refresh`, { refreshToken });
+        const response = await axios.post(`${API_URL}/api/auth/refresh`, { refreshToken });
         
         const { accessToken } = response.data;
         localStorage.setItem('accessToken', accessToken);
@@ -59,18 +59,26 @@ api.interceptors.response.use(
 );
 
 export const authAPI = {
-  login: (credentials) => api.post('/auth/login', credentials),
-  register: (userData) => api.post('/auth/register', userData),
-  verifyOTP: (otpData) => api.post('/auth/verify-otp', otpData),
-  refreshToken: (refreshToken) => api.post('/auth/refresh', { refreshToken }),
+  login: (credentials) => api.post('/api/auth/login', credentials),
+  register: (userData) => api.post('/api/auth/register', userData),
+  verifyOTP: (otpData) => api.post('/api/auth/verify-otp', otpData),
+  sendOTP: (phoneData) => api.post('/api/auth/send-otp', phoneData),
+  refreshToken: (refreshToken) => api.post('/api/auth/refresh', { refreshToken }),
 };
 
 export const productAPI = {
   getAllProducts: () => api.get('/api/products'),
+  getUserProducts: (userId) => api.get(`/api/products?userId=${userId}`),
   getProduct: (id) => api.get(`/api/products/${id}`),
   createProduct: (productData) => api.post('/api/products', productData),
   updateProduct: (id, productData) => api.put(`/api/products/${id}`, productData),
+  updateProductStatus: (id, status) => api.patch(`/api/products/${id}`, { status }),
   deleteProduct: (id) => api.delete(`/api/products/${id}`),
+  // Draft APIs
+  saveDraft: (draftData) => api.post('/api/products/draft', draftData),
+  getDrafts: (userId) => api.get(`/api/products/draft/${userId}`),
+  deleteDraft: (id) => api.delete(`/api/products/draft/${id}`),
+  publishDraft: (id) => api.post(`/api/products/draft/${id}/publish`),
 };
 
 export const orderAPI = {

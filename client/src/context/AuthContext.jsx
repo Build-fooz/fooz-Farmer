@@ -1,5 +1,11 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { authAPI } from '../services/api';
+import { 
+  storeAuthData, 
+  getUserData, 
+  getAuthTokens, 
+  clearAuthData 
+} from '../utils/storage';
 
 const AuthContext = createContext();
 
@@ -12,20 +18,20 @@ export const AuthProvider = ({ children }) => {
     // Check if user is already logged in
     const checkAuth = async () => {
       try {
-        const accessToken = localStorage.getItem('accessToken');
+        const { accessToken } = getAuthTokens();
         if (accessToken) {
           try {
-            // In a real implementation, you would verify the token with the server
-            // For now, we'll just assume it's valid if it exists
-            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-            if (userData && Object.keys(userData).length > 0) {
+            // Get user data from storage
+            const userData = getUserData();
+            if (userData) {
               setUser(userData);
+            } else {
+              // User data expired or not found, clear tokens
+              clearAuthData();
             }
           } catch (error) {
             console.error('Auth check failed:', error);
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('userData');
+            clearAuthData();
           }
         }
       } catch (err) {
@@ -44,9 +50,13 @@ export const AuthProvider = ({ children }) => {
       const response = await authAPI.login(credentials);
       const { accessToken, refreshToken, user: userData } = response.data;
       
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
-      localStorage.setItem('userData', JSON.stringify(userData));
+      // Store auth data using the utility
+      storeAuthData({
+        accessToken,
+        refreshToken,
+        user: userData
+      });
+      
       setUser(userData);
       
       return { success: true };
@@ -78,11 +88,13 @@ export const AuthProvider = ({ children }) => {
       
       // If OTP verification includes user data and tokens, save them
       if (response.data.accessToken) {
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
+        storeAuthData({
+          accessToken: response.data.accessToken,
+          refreshToken: response.data.refreshToken,
+          user: response.data.user
+        });
         
         if (response.data.user) {
-          localStorage.setItem('userData', JSON.stringify(response.data.user));
           setUser(response.data.user);
         }
       }
@@ -98,9 +110,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('userData');
+    clearAuthData();
     setUser(null);
   };
 

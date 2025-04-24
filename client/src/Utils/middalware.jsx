@@ -7,11 +7,22 @@ const api = axios.create({
   timeout: 10000, // Optional: sets a timeout limit for requests.
 });
 
-// Request middleware: logs and allows modifications before sending the request.
+// Request middleware: adds authentication token and logs before sending the request.
 api.interceptors.request.use(
   (config) => {
     console.log("Sending request to:", config.url);
-    // You can add headers or other modifications here if needed.
+    
+    // Get the authentication token from localStorage
+    const accessToken = localStorage.getItem('accessToken');
+    
+    // If token exists, add it to the Authorization header
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+      console.log("Added authentication token to request");
+    } else {
+      console.warn("No authentication token found in localStorage");
+    }
+    
     return config;
   },
   (error) => {
@@ -26,10 +37,18 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
+    if (error.response && error.response.status === 401) {
+      console.error("Authentication error - user not authorized");
+      // Optional: Redirect to login page or show auth error
+      // window.location.href = '/auth'; // Uncomment to redirect to login
+    }
+    
     console.error(
       "Error response from:",
-      error.config ? error.config.url : "Unknown URL"
+      error.config ? error.config.url : "Unknown URL",
+      error.response ? `Status: ${error.response.status}` : ""
     );
+    
     return Promise.reject(error);
   }
 );

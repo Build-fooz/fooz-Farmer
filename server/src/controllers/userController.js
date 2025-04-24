@@ -1,6 +1,8 @@
 const { Farmer } = require("../models/User");
 const jwt = require("jsonwebtoken");
 const { generateOTP, verifyOTP } = require("../utils/sms");
+const Analytics = require("../models/Analytics");
+const { uploadCertificate } = require("../utils/fileUpload");
 
 async function createFarmer(req, res) {
   const { fullName, phone, email, location, products, farmSize } = req.body;
@@ -17,12 +19,12 @@ async function createFarmer(req, res) {
   }
 
   try {
-
-    // TODO: Implement cloud storage for certificate file
-    // 1. Upload the certificate to cloud storage (AWS S3, Google Cloud Storage, etc.)
-    // 2. Get the URL of the uploaded file
-    // 3. Store the URL in the database instead of the file buffer
-
+    // Create a temporary ID to use for the certificate upload
+    const tempId = Date.now().toString();
+    
+    // Upload certificate to cloud storage
+    const certificateUrl = await uploadCertificate(certificate.buffer, tempId);
+    console.log(`Certificate uploaded to: ${certificateUrl}`);
 
     const newFarmer = new Farmer({
       fullName,
@@ -33,7 +35,7 @@ async function createFarmer(req, res) {
       farmSizeInAcres: farmSize,
       certificate: {
         fileName: certificate.originalname,
-        fileUrl: "placeholder-url-for-cloud-storage", // This will be replaced with actual cloud URL
+        fileUrl: certificateUrl,
         contentType: certificate.mimetype,
       },
       products: JSON.parse(products),
@@ -41,6 +43,32 @@ async function createFarmer(req, res) {
 
     // Save the farmer details to the database
     const newFarmerDocument = await newFarmer.save();
+    
+    // Now that we have the real farmer ID, we could update the certificate URL
+    // with the real ID in a production implementation, but our mock doesn't need it
+
+    // Create initial analytics record for the new farmer
+    try {
+      const initialAnalytics = new Analytics({
+        userId: newFarmerDocument._id,
+        productsListed: 0,
+        totalSales: 0,
+        activeOrders: 0,
+        cancelledOrders: 0,
+        draftListings: 0,
+        trendingProducts: [],
+        salesTrend: {
+          labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+          data: [0, 0, 0, 0]
+        }
+      });
+      
+      await initialAnalytics.save();
+      console.log(`Analytics record created for farmer ${newFarmerDocument._id}`);
+    } catch (analyticsError) {
+      // Log the error but don't fail the registration
+      console.error('Error creating analytics record:', analyticsError);
+    }
 
     // Return the farmer document
     return res.json(newFarmerDocument);
