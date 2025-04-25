@@ -47,8 +47,9 @@ exports.getUserAnalytics = async (req, res) => {
       
       // Try to populate with real data if available
       try {
-        // Get product count
-        const productsCount = await Product.countDocuments({ userId });
+        // Get product count - only count active products
+        const productsCount = await Product.countDocuments({ userId, status: 'active' });
+        console.log(productsCount);
         if (productsCount) defaultAnalytics.productsListed = productsCount;
         
         // Get draft count
@@ -119,7 +120,7 @@ exports.updateAnalytics = async (req, res) => {
     }
 
     // Collect updated data from other collections
-    const productsCount = await Product.countDocuments({ userId });
+    const productsCount = await Product.countDocuments({ userId, status: 'active'  });
     const draftsCount = await Draft.countDocuments({ userId });
 
     // For orders, handle potential absence of Order model or empty collection

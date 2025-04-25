@@ -72,7 +72,7 @@ export const productAPI = {
   getProduct: (id) => api.get(`/api/products/${id}`),
   createProduct: (productData) => api.post('/api/products', productData),
   updateProduct: (id, productData) => api.put(`/api/products/${id}`, productData),
-  updateProductStatus: (id, status) => api.patch(`/api/products/${id}`, { status }),
+  updateProductStatus: (id, status) => api.patch(`/api/products/${id}/status`, { status }),
   deleteProduct: (id) => api.delete(`/api/products/${id}`),
   // Draft APIs
   saveDraft: (draftData) => api.post('/api/products/draft', draftData),

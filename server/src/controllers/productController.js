@@ -8,8 +8,8 @@ const { uploadProductImage } = require("../utils/fileUpload");
 // Helper function to update user analytics
 const updateUserAnalytics = async (userId) => {
   try {
-    // Count user's products and drafts
-    const productsCount = await Product.countDocuments({ userId });
+    // Count user's active products and drafts
+    const productsCount = await Product.countDocuments({ userId, status: 'active' });
     const draftsCount = await Draft.countDocuments({ userId });
     
     // Update or create analytics document
@@ -23,7 +23,7 @@ const updateUserAnalytics = async (userId) => {
       { new: true, upsert: true }
     );
     
-    console.log(`Analytics updated for user ${userId}: Products=${productsCount}, Drafts=${draftsCount}`);
+    console.log(`Analytics updated for user ${userId}: Active Products=${productsCount}, Drafts=${draftsCount}`);
   } catch (error) {
     console.error(`Error updating analytics for user ${userId}:`, error);
     // Don't throw to prevent interrupting the main operation

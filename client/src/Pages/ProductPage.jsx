@@ -6,9 +6,11 @@ import { getAuthTokens } from '../utils/storage';
 import { productAPI } from '../services/api';
 import { toast } from 'react-toastify';
 import ProductForm from '../Components/ProductForm';
+import { useAnalytics } from '../context/AnalyticsContext';
 
 const ProductPage = () => {
   const { user } = useAuth();
+  const { refreshAnalytics } = useAnalytics();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -39,7 +41,6 @@ const ProductPage = () => {
         // Make API request using the productAPI service
         const response = await productAPI.getUserProducts(userId);
         console.log(response);
-        
         
         // The response format might be different, handle it accordingly
         if (response.data) {
@@ -111,6 +112,9 @@ const ProductPage = () => {
           // Remove the product from the products list
           const updatedProducts = products.filter((product) => product.uuid !== uuid);
           setProducts(updatedProducts);
+          
+          // Refresh analytics to update product count
+          refreshAnalytics();
         } else {
           console.log("Unexpected successful response:", response.data);
           toast.success("Product status updated");
@@ -123,6 +127,9 @@ const ProductPage = () => {
           } else if (Array.isArray(refreshResponse.data)) {
             setProducts(refreshResponse.data);
           }
+          
+          // Refresh analytics
+          refreshAnalytics();
         }
       }
     } catch (error) {
@@ -181,45 +188,10 @@ const ProductPage = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredProducts.map((product, index) => (
-                <tr key={product.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{index + 1}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.category}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{product.price}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.stock}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => {
-                          setCurrentProduct(product);
-                          setFormData({
-                            name: product.name,
-                            category: product.category,
-                            price: product.price,
-                            stock: product.stock,
-                            description: product.description,
-                          });
-                          setIsEditModalOpen(true);
-                        }}
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                        <FiEdit />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteProduct(product.id)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <FiTrash2 />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
               {filteredProducts.length > 0 ? (
-                filteredProducts.map((product) => (
+                filteredProducts.map((product, index) => (
                   <tr key={product.uuid} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.uuid.substring(0, 8)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{index + 1}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.productName}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.quantity}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.unit}</td>
