@@ -1,6 +1,8 @@
 const Product = require("../models/Product");
 const Draft = require("../models/Draft");
 const Analytics = require("../models/Analytics");
+const jwt = require('jsonwebtoken');
+const { authenticateToken } = require('../middleware/auth');
 
 const { v4: uuidv4 } = require('uuid');
 const { uploadProductImage } = require("../utils/fileUpload");
@@ -30,36 +32,12 @@ const updateUserAnalytics = async (userId) => {
   }
 };
 
-// Authentication middleware
-const verifyToken = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: "Authentication required" });
-  }
-
-  const token = authHeader.split(' ')[1];
-  try {
-    // In a real implementation, you would verify the token here
-    // For example: const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // For now we'll just check if it exists
-    if (!token) {
-      return res.status(401).json({ message: "Invalid token" });
-    }
-    
-    // Set userId from token payload in a real implementation
-    // For now, we'll use the one from the request body
-    next();
-  } catch (error) {
-    return res.status(401).json({ message: "Token verification failed" });
-  }
-};
-
 /**
  * Create a new product
  * @route POST /api/products
  */
 exports.createProduct = [
-  verifyToken,
+  authenticateToken,
   async (req, res) => {
     try {
       // Extract data from request body
@@ -147,7 +125,7 @@ exports.createProduct = [
  * @route POST /api/products/draft
  */
 exports.saveDraft = [
-  verifyToken,
+  authenticateToken,
   async (req, res) => {
     try {
       // Extract data from request body
@@ -232,7 +210,7 @@ exports.saveDraft = [
  * @route GET /api/products/drafts/:userId
  */
 exports.getDrafts = [
-  verifyToken,
+  authenticateToken,
   async (req, res) => {
     try {
       const { userId } = req.params;
@@ -279,7 +257,7 @@ exports.getDrafts = [
  * @route DELETE /api/products/draft/:uuid
  */
 exports.deleteDraft = [
-  verifyToken,
+  authenticateToken,
   async (req, res) => {
     try {
       const { uuid } = req.params;
@@ -329,7 +307,7 @@ exports.deleteDraft = [
  * @route POST /api/products/draft/:uuid/publish
  */
 exports.publishDraft = [
-  verifyToken,
+  authenticateToken,
   async (req, res) => {
     try {
       const { uuid } = req.params;
@@ -428,7 +406,7 @@ exports.publishDraft = [
  * @route GET /api/products/user/:userId
  */
 exports.getUserProducts = [
-  verifyToken,
+  authenticateToken,
   async (req, res) => {
     try {
       const userId = req.query.userId;
@@ -475,7 +453,7 @@ exports.getUserProducts = [
  * @route PATCH /api/products/:uuid/status
  */
 exports.updateProductStatus = [
-  verifyToken,
+  authenticateToken,
   async (req, res) => {
     try {
       const { uuid } = req.params;

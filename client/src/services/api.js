@@ -3,6 +3,7 @@ import axios from 'axios';
 // Use Vite's environment variables system (import.meta.env)
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
+// Create axios instance
 const api = axios.create({
   baseURL: API_URL,
   withCredentials: true,
@@ -58,14 +59,16 @@ api.interceptors.response.use(
   }
 );
 
+// Authentication API
 export const authAPI = {
   login: (credentials) => api.post('/api/auth/login', credentials),
-  register: (userData) => api.post('/api/auth/register', userData),
+  register: (userData) => api.post('/api/farmer/register', userData),
   verifyOTP: (otpData) => api.post('/api/auth/verify-otp', otpData),
   sendOTP: (phoneData) => api.post('/api/auth/send-otp', phoneData),
   refreshToken: (refreshToken) => api.post('/api/auth/refresh', { refreshToken }),
 };
 
+// Product API
 export const productAPI = {
   getAllProducts: () => api.get('/api/products'),
   getUserProducts: (userId) => api.get(`/api/products?userId=${userId}`),
@@ -81,6 +84,7 @@ export const productAPI = {
   publishDraft: (id) => api.post(`/api/products/draft/${id}/publish`),
 };
 
+// Order API
 export const orderAPI = {
   createOrder: (orderData) => api.post('/api/orders', orderData),
   getOrders: () => api.get('/api/orders'),
@@ -88,4 +92,5 @@ export const orderAPI = {
   updateOrderStatus: (id, status) => api.put(`/api/orders/${id}/status`, { status }),
 };
 
+// Export the default api instance for direct use
 export default api; 

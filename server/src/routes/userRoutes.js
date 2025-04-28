@@ -13,8 +13,12 @@ userRouter.post("/auth/refresh", authenticateToken, (req, res) => {
   res.json({ accessToken: req.newAccessToken });
 });
 
-// // Farmer routes
-// userRouter.post("/farmer/register", upload.single("certificate"), createFarmer);
-// userRouter.post("/farmer/login", loginFarmer);
+// Login route (moved to /auth/login for consistency)
+userRouter.post("/auth/login", loginFarmer);
+
+// Farmer routes
+userRouter.post("/farmer/register", upload.single("certificate"), createFarmer);
+// Preserve original path for backward compatibility
+userRouter.post("/farmer/login", loginFarmer);
 
 module.exports = userRouter;

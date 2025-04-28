@@ -12,6 +12,12 @@ export default defineConfig({
       '/auth': 'http://localhost:3000',
       '/orders': 'http://localhost:3000',
       '/analytics': 'http://localhost:3000'
-    }
+    },
+    historyApiFallback: true, // Enable history fallback for client-side routing
+  },
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+    sourcemap: process.env.NODE_ENV !== 'production'
   }
 })
