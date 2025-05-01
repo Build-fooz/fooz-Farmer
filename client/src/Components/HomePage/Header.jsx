@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import Logo from "../../assets/images/HomePage/logo.png";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { RxCross1 } from "react-icons/rx";
-
 import { useAuth } from "../../context/AuthContext";
 export default function Header() {
   const [showSidebar, setShowSidebar] = useState(false);

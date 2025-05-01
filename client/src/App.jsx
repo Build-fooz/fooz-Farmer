@@ -12,6 +12,7 @@ import ProductPage from './Pages/ProductPage';
 import { AuthProvider } from './context/AuthContext'
 import { AnalyticsProvider } from './context/AnalyticsContext'
 import TestPage from './Pages/TestPage'
+import ProductDetails from './Pages/ProductDetails'
 
 // Wrap in try-catch to prevent blank page if there's an error
 function SafeAuthProvider({ children }) {
@@ -58,6 +59,7 @@ function App() {
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/auth" element={<AuthForm />} />
           <Route path="/order" element={<OrderPage/>} />
+          <Route path="productDetails" element={<ProductDetails/>}/>
           <Route path= "/products" element={
             <SafeAnalyticsProvider>
               <ProductPage/>
