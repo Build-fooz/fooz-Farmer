@@ -59,7 +59,7 @@ function App() {
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/auth" element={<AuthForm />} />
           <Route path="/order" element={<OrderPage/>} />
-          <Route path="productDetails" element={<ProductDetails/>}/>
+          <Route path="/productDetails" element={<ProductDetails/>}/>
           <Route path= "/products" element={
             <SafeAnalyticsProvider>
               <ProductPage/>
