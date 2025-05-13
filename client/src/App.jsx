@@ -11,6 +11,8 @@ import OrderPage from './Pages/OrderPage';
 import ProductPage from './Pages/ProductPage';
 import { AuthProvider } from './context/AuthContext'
 import TestPage from './Pages/TestPage'
+import UserSignup from './Pages/UserSignup'
+import UserLogin from './Pages/UserLogin'
 
 // Wrap in try-catch to prevent blank page if there's an error
 function SafeAuthProvider({ children }) {
@@ -30,13 +32,18 @@ function App() {
           <Route path="/test" element={<TestPage />} />
           <Route path="/" element={<Home />} />
           {/* <Route path="/about" element={<About />} /> */}
-          <Route path="/userdashboard" element={<Dashboard/>} />
-          <Route path="/deliverydashboard" element={<DeliveryDashboard/>} />
-          <Route path="/productListing" element={<ProductListing/>} />
+          <Route path="/userdashboard" element={<Dashboard />} />
+          <Route path="/deliverydashboard" element={<DeliveryDashboard />} />
+          <Route path="/productListing" element={<ProductListing />} />
           <Route path="/register" element={<RegisterForm />} />
+
+          <Route path="/UserSignup" element={<UserSignup/>} />
+
+          <Route path='/UserLogin' element={<UserLogin/>}/>
+
           <Route path="/auth" element={<AuthForm />} />
-          <Route path="/order" element={<OrderPage/>} />
-          <Route path= "/product" element={<ProductPage/>}/>
+          <Route path="/order" element={<OrderPage />} />
+          <Route path="/product" element={<ProductPage />} />
           <Route path="*" element={<NotFound />} /> {/* Handles unknown routes */}
         </Routes>
       </Router>
